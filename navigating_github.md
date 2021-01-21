@@ -1,1 +1,1 @@
-My favorite color is not gray.
+**My favorite color is not gray.**
