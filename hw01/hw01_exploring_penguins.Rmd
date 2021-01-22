@@ -1,0 +1,58 @@
+---
+title: 'Homework 01: Exploring Penguins'
+author: "Greg Rousis"
+date: "1/21/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(palmerpenguins)
+library(dplyr)
+library(ggplot2)
+library(kableExtra)
+dat <- palmerpenguins::penguins
+```
+
+## Palmer Penguins Dataset
+
+### First, let's see some frequency distributions and scatterplots of our variables
+
+```{r penguins plots, echo=FALSE}
+
+ggplot(data = dat, aes(x = species))+
+  geom_bar(fill = c("light blue", "light green", "gray"))+
+  theme_classic()
+
+ggplot(data = dat, aes(x = island))+
+  geom_bar(fill = c("light blue", "light green", "gray"))+
+  theme_classic()
+
+ggplot(data = dat, aes(x = sex))+
+  geom_bar(fill = c("pink", "blue", "black"))+
+  theme_classic()
+
+ggplot(data = dat, aes(x = year))+
+  geom_bar()+
+  theme_classic()
+
+ggplot(data = dat, aes(x = body_mass_g, y = bill_length_mm))+
+  geom_jitter()+
+  theme_classic()
+
+
+ggplot(data = dat, aes(x = sex, y = bill_length_mm))+
+  geom_col(aes(fill = sex))+
+  theme_classic()
+
+```
+
+
+### Now, let's look at some descriptive statistics for our variables
+
+```{r penguins descriptives, echo=FALSE}
+
+
+
+```
+
