@@ -9,7 +9,11 @@ output: html_document
 
 ### This is template repository for hosting and posting homework assignments for Programming with Data.
 
-### This repository is composed of homework assignments and other useful things for the class.
+### This repository is composed of homework assignments and other useful things for the class and will include the following:
+### * Reproducible code
+### * Data exploration
+### * Data visualization
+### * APA-style write-ups generated using R Markdown
 
 # About Me
 
