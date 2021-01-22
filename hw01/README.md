@@ -23,4 +23,4 @@ output: html_document
 
 ## Here's a picture of my cat!
 
-![Houdini](C:\Users\Greg Rousis\GitHub\hw-gregrousis\hw01\cat_pic.jpg)
+![Houdini](tree/hw01/hw01/cat_pic.jpg)
