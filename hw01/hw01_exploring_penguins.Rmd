@@ -52,7 +52,16 @@ ggplot(data = dat, aes(x = sex, y = bill_length_mm))+
 
 ```{r penguins descriptives, echo=FALSE}
 
-
+kable(psych::describe(dat[,3:6]))
 
 ```
+
+
+
+
+# That's it for now!
+
+
+
+
 
