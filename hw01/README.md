@@ -19,8 +19,3 @@ output: html_document
 ### 1. Online extremism
 ### 2. Sexism 
 ### 3. Manhood and masculinity
-
-
-## Here's a picture of my cat!
-
-![Houdini](tree/hw01/hw01/cat_pic.jpg)
