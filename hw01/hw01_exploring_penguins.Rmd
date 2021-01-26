@@ -2,7 +2,10 @@
 title: 'Homework 01: Exploring Penguins'
 author: "Greg Rousis"
 date: "1/21/2021"
-output: md_document
+output:
+  md_document: default
+  html_document: default
+  github_document: default
 ---
 
 ```{r setup, include=FALSE}
