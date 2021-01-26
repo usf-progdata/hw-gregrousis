@@ -1,0 +1,38 @@
+---
+title: "plotting_ggplot"
+author: "Greg Rousis"
+date: "1/26/2021"
+output: 
+  html_document: default
+  github_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(gapminder))
+suppressPackageStartupMessages(library(scales))
+suppressPackageStartupMessages(library(tsibble))
+knitr::opts_chunk$set(fig.align = "center")
+library(ggplot2)
+knitr::opts_chunk$set(fig.width = 5, fig.height = 4, fig.align = "center")
+library(progdata)
+```
+
+
+```{r gapminder plot}
+
+ggplot(gapminder, aes(gdpPercap, lifeExp)) +
+  geom_point(alpha = 0.1) + #transparency setting for points
+  scale_x_log10("GDP per capita", labels = scales::dollar_format()) +
+  theme_bw()+
+  ylab("Life Expectancy")
+
+```
+
+```{r tutorial}
+
+tutorial_ggplot()
+
+```
+
