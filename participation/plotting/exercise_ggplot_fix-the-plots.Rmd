@@ -163,7 +163,7 @@ ggplot(gapminder) +
   geom_point() +
   scale_x_log10(labels = scales::dollar_format())
 
-#the above code isn't wrking because the 'size' call is in the aesthetic mapping rather than the geom
+#the above code isn't working because the 'size' call is in the aesthetic mapping rather than the geom
 
 ggplot(gapminder) +
   aes(gdpPercap, lifeExp, size = 0.1) +
@@ -190,9 +190,16 @@ caribou_path <-
     4, 0.4, 0.5
   )
 
+#connecting points based on time and adding arrow
+
 ggplot(caribou_path) +
-  aes(x, y) + 
-  geom_line()
+  aes(x = x, 
+      y = y,
+      label = time) + 
+  geom_path(arrow = arrow()) +
+  geom_text(nudge_y = -0.02)
+
+
 ```
 
 ## Exercise 5: Life expectancies in Africa
@@ -213,6 +220,19 @@ ggplot(americas) +
   geom_point() +
   geom_boxplot() +
   scale_x_discrete()
+
+#making points visible and adjusting the overlapping text
+
+ggplot(americas) + 
+  aes(x = country, 
+      y = lifeExp) +
+  geom_point() +
+  geom_boxplot(alpha = 0.5) +
+  scale_x_discrete(name = "Country",
+                   guide = guide_axis(n.dodge = 3)) +
+  ylab("Life Expectancy (years)")
+  
+
 ```
 
 ### 5(b) Ridgeplots
@@ -224,6 +244,14 @@ ggplot(americas) +
   aes(country, lifeExp) +
   geom_point() +
   geom_boxplot()
+
+# ridgeplot
+
+ggplot(americas) +
+  aes(x = country,
+      y = lifeExp) +
+  geom_density_ridges()
+
 ```
 
 ## Exercise 6: Bar plot madness
