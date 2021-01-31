@@ -26,6 +26,8 @@ library(tidyverse)
 library(gapminder)
 library(ggridges)
 library(scales)
+theme_set(theme_classic())
+
 ```
 
 <!-- The following chunk allows errors when knitting -->
@@ -247,10 +249,13 @@ ggplot(americas) +
 
 # ridgeplot
 
-ggplot(americas) +
-  aes(x = country,
-      y = lifeExp) +
-  geom_density_ridges()
+ggplot(americas)+
+  aes(x = lifeExp,
+      y = country,
+      group = country) +
+  geom_density_ridges(bandwidth = 1.0) +
+  xlab(label = "Life Expectancy") +
+  ylab(label = "Country")
 
 ```
 
@@ -267,9 +272,22 @@ ggplot(americas) +
 
 ```{r, fig.width = 5, fig.height = 2}
 mtcars2 <- mutate(mtcars, transmission = if_else(am == 0, "automatic", "manual"))
+
 ggplot(mtcars2) +
   aes(cyl) +
   geom_bar(aes(color = transmission))
+
+#adjusting
+
+ggplot(mtcars2) +
+  aes(x = as.factor(cyl),
+      fill = as.factor(transmission),
+      color = as.factor(transmission))+
+  geom_bar(aes(y = (..count..)/sum(..count..))) +
+  scale_y_continuous()
+
+
+
 ```
 
 ### 6(b) Bar heights already calculated
