@@ -252,8 +252,9 @@ ggplot(americas) +
 ggplot(americas)+
   aes(x = lifeExp,
       y = country,
-      group = country) +
-  geom_density_ridges(bandwidth = 1.0) +
+      fill = country) +
+  geom_density_ridges(bandwidth = 1.0,
+                      alpha = .5) +
   xlab(label = "Life Expectancy") +
   ylab(label = "Country")
 
@@ -281,12 +282,11 @@ ggplot(mtcars2) +
 
 ggplot(mtcars2) +
   aes(x = as.factor(cyl),
-      fill = as.factor(transmission),
-      color = as.factor(transmission))+
+      fill = as.factor(transmission))+
   geom_bar(aes(y = (..count..)/sum(..count..))) +
-  scale_y_continuous()
-
-
+  ylab(label = "Proportion") +
+  xlab(label = "# of Cylinders")+
+  scale_fill_discrete(name = "Transmission") #change legend name
 
 ```
 
@@ -305,6 +305,17 @@ Fix the following bar plot so that it shows these counts.
 ggplot(hair) +
   aes(Hair, n) +
   geom_bar()
+
+#change stat to identity to get counts
+
+ggplot(hair) +
+  aes(x = Hair,
+      y = n,
+      fill = Hair) +
+  geom_bar(stat = "identity") +
+  ylab(label = "Count") +
+  xlab(label = "Hair Color")
+
 ```
 
 ## Exercise 7: Tiling
@@ -322,6 +333,16 @@ _Hint:_ What's the title of this exercise?
 ```{r}
 ggplot(hair_eye, aes(Hair, Eye)) +
   geom_point(aes(colour = n))
+
+
+#change geom to raster
+
+ggplot(hair_eye) + 
+  aes(x = Hair, 
+      y = Eye) +
+  geom_raster(aes(fill = n))
+
+
 ```
 
 By the way, `geom_count()` is like `geom_bar()`: it counts the number of overlapping points, but plots a point instead of a column.
