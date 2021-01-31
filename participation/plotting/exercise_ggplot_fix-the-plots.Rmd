@@ -1,9 +1,9 @@
 ---
 title: "ggplot2 exercises: Fix the plots"
 output: 
+  github_document: default
   html_document:
     theme: paper
-  github_document: default
 editor_options: 
   chunk_output_type: console
 ---
@@ -283,7 +283,8 @@ ggplot(mtcars2) +
 ggplot(mtcars2) +
   aes(x = as.factor(cyl),
       fill = as.factor(transmission))+
-  geom_bar(aes(y = (..count..)/sum(..count..))) +
+  geom_bar(aes(y = (..count..)/sum(..count..)),
+           position = "dodge") +
   ylab(label = "Proportion") +
   xlab(label = "# of Cylinders")+
   scale_fill_discrete(name = "Transmission") #change legend name
