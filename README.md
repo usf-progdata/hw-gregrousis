@@ -11,11 +11,11 @@ output: html_document
 
 # Homework Template
 
-<!-- For best results, don't use headings except for actual headings. -->
+
 
 This is template repository for hosting and posting homework assignments for Programming with Data.
 
-<!-- Place a blank line between paragraphs, starts of lists, headings, etc. Markdown will ignore 1 line break. -->
+
 
 This repository is composed of homework assignments and other useful things for the class and will include the following:
 
