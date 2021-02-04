@@ -3,8 +3,8 @@ title: "hw02"
 author: "Greg Rousis"
 date: "2/4/2021"
 output: 
-  github_document: default
   html_document: default
+  github_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -135,7 +135,7 @@ penguins %>%
 
 ```
 
-#Bonus Exercise
+# Bonus Exercise
 
 ```{r bonus}
 
