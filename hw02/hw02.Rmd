@@ -135,6 +135,20 @@ penguins %>%
 
 ```
 
+#Bonus Exercise
+
+```{r bonus}
+
+#code evaluation
+
+filter(gapminder, country == c("Rwanda", "Afghanistan"))
+
+#code above does not work because it's looping through the dataset iteratively, looking for Rwanda, then Afghanistan, then Rwanda, etc. This means that half of the data will be removed. To fix it, need to supply an "OR" statement:
+
+filter(gapminder, country == "Rwanda" | country == "Afghanistan")
+
+```
+
 
 
 
