@@ -14,14 +14,14 @@ knitr::opts_chunk$set(error = TRUE)
 # Intro to `dplyr` syntax
 
 Load the `gapminder` and `tidyverse` packages.
-    - This loads `dplyr`, too.
+- This loads `dplyr`, too.
 
 ```{r load packages}
 # load your packages here:
 library(gapminder)
 library(tidyverse)
 ```
-    
+
 
 ## `select()`
 
@@ -183,7 +183,7 @@ Make a new column called `cc` that pastes the country name followed by the conti
 
 gapminder %>% 
   mutate(cc = paste(country, continent, sep = ", "))
-  
+
 
 ```
 
@@ -208,7 +208,8 @@ Let's use `across()` to rescale the personality scores in `psych::bfi` to be on 
 ```{r}
 psych::bfi %>%
   as_tibble(rownames = ".id") %>% 
-  mutate(across(A1:O5, ~ (.x - 1) / 5 * 100))
+  mutate(across(A1:O5, ~ (.x - 1) / 5 * 100)) #.x is placeholder for A1 thru o5
+
 ```
 
 Now, let's use `across()` to **mean center** all of the numeric variables in gapminder:
@@ -219,7 +220,7 @@ gapminder %>%
 
 gapminder %>% 
   filter(country == "Canada") %>% 
-  mutate(across(where(is.numeric), ~ .x - mean(.x, na.rm = TRUE)))
+  mutate(across(where(is.numeric), ~ .x - mean(.x, na.rm = TRUE))) #where variables are numeric, do this
 ```
 
 You can check out other ways to select matching variables by running:
@@ -251,7 +252,9 @@ When you group a data frame, all operations on that data frame are done **separa
 
 ```{r}
 gapminder %>% 
-  group_by(year)
+  group_by(year) %>% 
+  summarize(mu = mean(lifeExp),
+            sigma = sd(lifeExp))
 ```
 
 See how the printing of the tibble now says it is grouped?
@@ -283,6 +286,10 @@ gapminder %>%
 
 When you use `group_by()` with `mutate()`, always `ungroup()` at the end so that future operations happen on the whole dataset rather than by group!
 
+```{r}
+#rowwise function will calculate the mean score for each row of data, but still needs to be ungrouped 
+
+```
 
 
 # Exercises for grouped data frames
@@ -388,15 +395,15 @@ mutate(lifeExp_incr = lifeExp - lag(lifeExp)) %>%
 If there's time remaining, we'll practice with these exercises. 
 
 1. In `gapminder`, take all countries in Europe that have a GDP per capita 
-   greater than 10000, and select all variables except `gdpPercap`. 
-   (Hint: use `-`).
+greater than 10000, and select all variables except `gdpPercap`. 
+(Hint: use `-`).
 
 2. Take the first three columns of `gapminder` and extract the names.
 
 3. In `gapminder`, convert the population to a number in billions.
 
 4. Take the `palmerpenguins::penguins` data frame and extract all columns that start with the word "bill". 
-    - Hint: take a look at the "Select helpers" documentation by running the 
-      following code: `?tidyselect::select_helpers`.
+- Hint: take a look at the "Select helpers" documentation by running the 
+following code: `?tidyselect::select_helpers`.
 
 5. Filter the rows of `palmerpenguins::penguins` for bill_lenth_mm >= 40 and flipper_length_mm >= 200.
