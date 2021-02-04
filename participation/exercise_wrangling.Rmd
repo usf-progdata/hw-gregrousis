@@ -18,8 +18,8 @@ Load the `gapminder` and `tidyverse` packages.
 
 ```{r load packages}
 # load your packages here:
-library(FILL_THIS_IN)
-library(FILL_THIS_IN)
+library(gapminder)
+library(tidyverse)
 ```
     
 
@@ -29,7 +29,7 @@ library(FILL_THIS_IN)
 the `gapminder` data, in that order.
 
 ```{r}
-select(gapminder, FILL_THIS_IN)
+select(gapminder, year, lifeExp, country)
 ```
 
 2. Select all variables, from `country` to `lifeExp`.
@@ -39,19 +39,19 @@ select(gapminder, FILL_THIS_IN)
 select(gapminder, country, continent, year, lifeExp)
 
 # Do it shorter with `:` :
-select(gapminder, FILL_THIS_IN)
+select(gapminder, country:lifeExp)
 ```
 
 3. Select all variables, except `lifeExp`.
 
 ```{r}
-select(gapminder, FILL_THIS_IN)
+select(gapminder, -lifeExp)
 ```
 
 4. Put `continent` first. Hint: use the `everything()` function.
 
 ```{r}
-select(gapminder, FILL_THIS_IN, FILL_THIS_IN)
+select(gapminder, continent, everything())
 ```
 
 5. Rename `continent` to `cont`.
@@ -60,7 +60,7 @@ select(gapminder, FILL_THIS_IN, FILL_THIS_IN)
 # compare
 select(gapminder, FILL_THIS_IN)
 
-rename(gapminder, FILL_THIS_IN)
+rename(gapminder, cont = continent)
 ```
 
 
@@ -69,19 +69,19 @@ rename(gapminder, FILL_THIS_IN)
 1. Order by year.
 
 ```{r}
-arrange(gapminder, FILL_THIS_IN)
+arrange(gapminder, year)
 ```
 
 2. Order by year, in descending order.
 
 ```{r}
-arrange(gapminder, FILL_THIS_IN)
+arrange(gapminder, desc(year))
 ```
 
 3. Order by year, then by life expectancy.
 
 ```{r}
-arrange(gapminder, FILL_THIS_IN, FILL_THIS_IN)
+arrange(gapminder, year, lifeExp)
 ```
 
 
@@ -95,6 +95,10 @@ Select `year`, `lifeExp`, `country` from the `gapminder`, then arrange in order 
 
 ```{r}
 
+gapminder %>% 
+  select(year, lifeExp, country) %>% 
+  arrange(year, lifeExp)
+
 ```
 
 
@@ -106,21 +110,21 @@ Select `year`, `lifeExp`, `country` from the `gapminder`, then arrange in order 
 
 ```{r}
 gapminder %>%
-  filter(FILL_THIS_IN)
+  filter(pop > 1000000)
 ```
 
 2. Only keep data _from Asia_ with population greater than 100 million.
 
 ```{r}
 gapminder %>%
-  filter(FILL_THIS_IN)
+  filter(continent == "Asia" & pop > 100000000)
 ```
 
 3. Only keep data _from the countries Brazil and China_ with population greater than 100 million.
 
 ```{r}
 gapminder %>%
-  filter(FILL_THIS_IN)
+  filter(country == "Brazil" | country == "China" & pop > 100000000)
 ```
 
 ## `mutate()`
@@ -141,7 +145,10 @@ Let's get:
 
 ```{r}
 gapminder %>%
-  mutate(FILL_THIS_IN)
+  mutate(grossGDP = pop*gdpPercap) %>% 
+  mutate(gdpBill = grossGDP/1000000000) %>% 
+  mutate(gdpBill = sprintf("%0.2f", gdpBill))
+
 ```
 
 Notice the backwards compatibility! No need for loops!
@@ -150,7 +157,9 @@ Try the same thing, but with `transmute` (drops all other variables).
 
 ```{r}
 gapminder %>%
-  transmute(FILL_THIS_IN)
+  transmute(grossGDP = pop*gdpPercap) %>% 
+  transmute(gdpBill = grossGDP/1000000000) %>% 
+  transmute(gdpBill = sprintf("%0.2f", gdpBill))
 ```
 
 The `if_else` function is useful for changing certain elements in a data frame.
@@ -158,8 +167,12 @@ The `if_else` function is useful for changing certain elements in a data frame.
 Example: Suppose Canada's 1952 life expectancy was mistakenly entered as 68.8 in the data frame, but is actually 70. Fix it using `if_else` and `mutate`. 
 
 ```{r}
+
 gapminder %>%
-  mutate(FILL_THIS_IN)
+  mutate(lifeExp = 
+           if_else(country == "Canada" & year == 1952, 70, lifeExp))
+
+
 ```
 
 Your turn: 
@@ -167,6 +180,11 @@ Make a new column called `cc` that pastes the country name followed by the conti
 (Hint: use the `paste()` function with the `sep=", "` argument).
 
 ```{r}
+
+gapminder %>% 
+  mutate(cc = paste(country, continent, sep = ", "))
+  
+
 ```
 
 These functions we've seen are called __vectorized functions__—they are designed to work with vectors and do their computation on each element of the vector(s).
