@@ -14,3 +14,41 @@ library(tidyverse)
 ```
 
 
+# Exercise 1: Basic dplyr
+
+
+```{r exercise 1}
+
+#Exercises 1.1 and 1.2
+
+gapminder %>% 
+  filter(country == c("Afghanistan", "Iraq", "Syria")) %>% 
+  select(country, gdpPercap)
+
+#Exercise 1.3
+
+gapminder %>% 
+  mutate(lifExpChange = lifeExp - lag(lifeExp)) %>% 
+  filter(lifExpChange < 0)
+
+#Exercise 1.4
+
+gapminder %>% 
+  group_by(country) %>% 
+  slice_max(gdpPercap)
+
+#Exercies 1.5
+
+gapminder %>% 
+  filter(country == "Canada") %>% 
+  ggplot() +
+  aes(x = lifeExp,
+      y = gdpPercap) +
+  geom_point() +
+  scale_y_log10("GDP per capita", labels = scales::comma) +
+  xlab("Life Expectancy") +
+  theme_classic()
+
+
+```
+
