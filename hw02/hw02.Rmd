@@ -11,6 +11,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 library(gapminder)
 library(tidyverse)
+library(palmerpenguins)
 ```
 
 
@@ -51,4 +52,50 @@ gapminder %>%
 
 
 ```
+
+
+
+
+# Exercise 2: Exploring Variables
+
+```{r exercise 2}
+
+#Exercise 2.1
+
+penguins %>% 
+  summarize(Mean_bill_length = mean(bill_length_mm, na.rm = TRUE),
+            sd_bill_length = sd(bill_length_mm, na.rm = TRUE),
+            Mean_mass = mean(body_mass_g, na.rm = TRUE),
+            sd_mass = sd(body_mass_g, na.rm = TRUE),
+            median_bill_length = median(bill_length_mm, na.rm = TRUE),
+            median_mass = median(body_mass_g, na.rm = TRUE))
+
+penguins %>% 
+  group_by(species, sex) %>% 
+  filter(!is.na(sex)) %>% 
+  summarize(Mean_bill_length = mean(bill_length_mm, na.rm = TRUE),
+            sd_bill_length = sd(bill_length_mm, na.rm = TRUE),
+            Mean_mass = mean(body_mass_g, na.rm = TRUE),
+            sd_mass = sd(body_mass_g, na.rm = TRUE),
+            median_bill_length = median(bill_length_mm, na.rm = TRUE),
+            median_mass = median(body_mass_g, na.rm = TRUE))
+
+ggplot(penguins) +
+  aes(x = body_mass_g,
+      y = bill_length_mm,
+      fill = species,
+      color = species) +
+  geom_jitter(alpha = 0.5) +
+  geom_smooth(method = "lm",
+              alpha = 0.1) +
+  ylab("Bill Length (mm)") +
+  xlab("Body mass (grams)") +
+  theme_classic() +
+  theme(legend.position = "bottom")
+
+
+```
+
+
+
 
