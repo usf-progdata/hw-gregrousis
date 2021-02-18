@@ -23,22 +23,22 @@ library(palmerpenguins)
 #Exercises 1.1 and 1.2
 
 gapminder %>% 
-  filter(country == "Afghanistan" | country == "Iraq" | country == "Syria") %>% 
+  filter(country == "Afghanistan" | country == "Iraq" | country == "Syria") %>% # BMW: This works, but country %in% c("Afghanistan", "Iraq", "Syria") might be easier to work with.
   select(country, gdpPercap)
 
 #Exercise 1.3
 
 gapminder %>% 
   mutate(lifExpChange = lifeExp - lag(lifeExp)) %>% 
-  filter(lifExpChange < 0)
+  filter(lifExpChange < 0) # BMW: Great work!
 
 #Exercise 1.4
 
 gapminder %>% 
   group_by(country) %>% 
-  slice_max(gdpPercap)
+  slice_max(gdpPercap) # BMW: Look at that! A function I didn't know about!
 
-#Exercies 1.5
+#Exercise 1.5
 
 gapminder %>% 
   filter(country == "Canada") %>% 
@@ -47,10 +47,8 @@ gapminder %>%
       y = gdpPercap) +
   geom_point() +
   scale_y_log10("GDP per capita", labels = scales::comma) +
-  xlab("Life Expectancy") +
+  xlab("Life Expectancy") + # BMW: Very nice!
   theme_classic()
-
-
 ```
 
 
@@ -82,10 +80,9 @@ ggplot(penguins) +
   ylab("Bill Length (mm)") +
   xlab("Body mass (grams)") +
   theme_classic() +
-  theme(legend.position = "bottom")
+  theme(legend.position = "bottom") # BMW: Very nice!
 
 #Exercise 2.2
-
 
 penguins %>% 
   group_by(species) %>% 
@@ -114,7 +111,7 @@ penguins %>%
       y = flipper_length_mm,
       fill = sex,
       color = sex) +
-  geom_jitter() +
+  geom_jitter(height = 0, width = .1) + # BMW: When you geom_jitter() with a categorical and continuous variable, don't jitter along the axis of the continuous variable and adjust the jitter width for the categorical axis to avoid the two subgroups overlapping.
   geom_boxplot(alpha = 0.4) +
   ylab("Flipper Length (mm)") +
   theme_classic()
@@ -127,11 +124,10 @@ penguins %>%
       y = flipper_length_mm,
       fill = island,
       color = island) +
-  geom_jitter() +
+  geom_jitter(height = 0, width = .1) +
   geom_boxplot(alpha = 0.4) +
   ylab("Flipper Length (mm)") +
   theme_classic()
-
 
 ```
 
@@ -145,10 +141,6 @@ filter(gapminder, country == c("Rwanda", "Afghanistan"))
 
 #code above does not work because it's looping through the dataset iteratively, looking for Rwanda, then Afghanistan, then Rwanda, etc. This means that half of the data will be removed. To fix it, need to supply an "OR" statement:
 
-filter(gapminder, country == "Rwanda" | country == "Afghanistan")
+filter(gapminder, country == "Rwanda" | country == "Afghanistan") # BMW: Great. Or %in%
 
 ```
-
-
-
-
