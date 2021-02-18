@@ -11,6 +11,144 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 library(gapminder)
 library(tidyverse)
+library(palmerpenguins)
 ```
+
+
+# Exercise 1: Basic dplyr
+
+
+```{r exercise 1}
+
+#Exercises 1.1 and 1.2
+
+gapminder %>% 
+  filter(country == "Afghanistan" | country == "Iraq" | country == "Syria") %>% 
+  select(country, gdpPercap)
+
+#Exercise 1.3
+
+gapminder %>% 
+  mutate(lifExpChange = lifeExp - lag(lifeExp)) %>% 
+  filter(lifExpChange < 0)
+
+#Exercise 1.4
+
+gapminder %>% 
+  group_by(country) %>% 
+  slice_max(gdpPercap)
+
+#Exercies 1.5
+
+gapminder %>% 
+  filter(country == "Canada") %>% 
+  ggplot() +
+  aes(x = lifeExp,
+      y = gdpPercap) +
+  geom_point() +
+  scale_y_log10("GDP per capita", labels = scales::comma) +
+  xlab("Life Expectancy") +
+  theme_classic()
+
+
+```
+
+
+
+
+# Exercise 2: Exploring Variables
+
+```{r exercise 2}
+
+#Exercise 2.1
+
+penguins %>% 
+  summarize(Mean_bill_length = mean(bill_length_mm, na.rm = TRUE),
+            sd_bill_length = sd(bill_length_mm, na.rm = TRUE),
+            Mean_mass = mean(body_mass_g, na.rm = TRUE),
+            sd_mass = sd(body_mass_g, na.rm = TRUE),
+            median_bill_length = median(bill_length_mm, na.rm = TRUE),
+            median_mass = median(body_mass_g, na.rm = TRUE))
+
+
+ggplot(penguins) +
+  aes(x = body_mass_g,
+      y = bill_length_mm,
+      fill = species,
+      color = species) +
+  geom_jitter(alpha = 0.5) +
+  geom_smooth(method = "lm",
+              alpha = 0.1) +
+  ylab("Bill Length (mm)") +
+  xlab("Body mass (grams)") +
+  theme_classic() +
+  theme(legend.position = "bottom")
+
+#Exercise 2.2
+
+
+penguins %>% 
+  group_by(species) %>% 
+  filter(!is.na(species)) %>% 
+  summarize(sample_size = n(),
+            Mean_flipper_length = mean(flipper_length_mm, na.rm = TRUE),
+            sd_flipper_length = sd(flipper_length_mm, na.rm = TRUE),
+            median_flipper_length = median(flipper_length_mm, na.rm = TRUE))
+
+penguins %>% 
+  filter(!is.na(flipper_length_mm)) %>% 
+  ggplot() +
+  aes(x = species,
+      y = flipper_length_mm,
+      fill = species,
+      color = species) +
+  geom_jitter() +
+  geom_boxplot(alpha = 0.4) +
+  ylab("Flipper Length (mm)") +
+  theme_classic()
+
+penguins %>% 
+  filter(!is.na(sex)) %>% 
+  ggplot() +
+  aes(x = species,
+      y = flipper_length_mm,
+      fill = sex,
+      color = sex) +
+  geom_jitter() +
+  geom_boxplot(alpha = 0.4) +
+  ylab("Flipper Length (mm)") +
+  theme_classic()
+
+
+penguins %>% 
+  filter(!is.na(flipper_length_mm)) %>% 
+  ggplot() +
+  aes(x = species,
+      y = flipper_length_mm,
+      fill = island,
+      color = island) +
+  geom_jitter() +
+  geom_boxplot(alpha = 0.4) +
+  ylab("Flipper Length (mm)") +
+  theme_classic()
+
+
+```
+
+# Bonus Exercise
+
+```{r bonus}
+
+#code evaluation
+
+filter(gapminder, country == c("Rwanda", "Afghanistan"))
+
+#code above does not work because it's looping through the dataset iteratively, looking for Rwanda, then Afghanistan, then Rwanda, etc. This means that half of the data will be removed. To fix it, need to supply an "OR" statement:
+
+filter(gapminder, country == "Rwanda" | country == "Afghanistan")
+
+```
+
+
 
 
