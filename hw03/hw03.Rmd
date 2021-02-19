@@ -1,19 +1,98 @@
+---
+title: "hw03"
+author: "Greg Rousis"
+date: "2/18/2021"
+output: 
+  html_document: default
+  github_document: default
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+#loading required packages
+
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(reshape2)
+theme_set(theme_classic())
+
+```
+
 # Homework 03
 
 You will analyze data looking at the relationship between **green reputation** and three personality traits--**compassion**, **intellectual curiosity**, and **openness to experiences**.
 The dataset includes data from **students** and **non-students**.
 
-```{r}
+```{r data}
 dictionary <- readr::read_csv("green_dictionary.csv")
 green_data <- readr::read_csv("green_data.csv")
+
+print(dictionary, n = 36)
+
 ```
 
-For your assignment, do the following.
+#Question 1:
 
   1. Inspect the item responses (e.g., with graphs or by summarizing distinct values). 
      Is anything unusual?
+     
+```{r data inspection}
+green_data %>% 
+  summary()
+```
+
+## There are some -99's, which need to be recoded as missing
+
+```{r data inspection}
+
+green_data <- green_data %>% 
+  mutate_at(vars(comp1:student),
+            ~ifelse(. == -99, NA, .)
+  )
+
+green_data %>% 
+  summary()
+  
+melt.green <- melt(green_data)
+
+head(melt.green)
+
+ggplot(melt.green) +
+  aes(x = value) +
+  geom_histogram() +
+  facet_wrap(~variable, 
+             scales = "free")
+```
+
+
+# Question 2:
+
   2. Compute total scores for the four scales. 
      Recode variables as needed.
+     
+     
+```{r total scores}
+
+# pull the reverse-coded items from the dictionary
+reversed <- dictionary %>%
+  filter(Keying <= 0) %>%
+  pull(Item)
+
+#recode to match direction of other items
+
+green_data <- green_data %>%
+  mutate(
+    across(all_of(reversed),
+           ~  6-.x,
+           .names = "{.col}r")
+  )
+
+green_data %>% 
+  select(green2, green2r)
+
+```
+
   3. Rescale the variables so that they go from 0-100 instead of the original range.
      Name the recaled variables `*_pomp`.
   4. Make plots that illustrate the distributions of the 4 POMP-scored variables.
