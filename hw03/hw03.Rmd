@@ -12,6 +12,7 @@ editor_options:
 ```{r setup, include=FALSE}
 #loading required packages
 
+setwd("C:/Users/Greg Rousis/GitHub/hw-gregrousis/hw03")
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(reshape2)
@@ -32,7 +33,7 @@ print(dictionary, n = 36)
 
 ```
 
-#Question 1:
+# Question 1: inspect item responses
 
   1. Inspect the item responses (e.g., with graphs or by summarizing distinct values). 
      Is anything unusual?
@@ -53,6 +54,15 @@ green_data <- green_data %>%
 
 green_data %>% 
   summary()
+
+green_data <- 
+  green_data %>% 
+  mutate(student = factor(student, levels = c(1, 2))) %>% 
+  mutate(
+    student = recode(student, "1" = "Not a student", "2" = "Student")
+  )
+
+  
   
 melt.green <- melt(green_data)
 
@@ -66,7 +76,7 @@ ggplot(melt.green) +
 ```
 
 
-# Question 2:
+# Question 2: compute total scores
 
   2. Compute total scores for the four scales. 
      Recode variables as needed.
@@ -91,14 +101,116 @@ green_data <- green_data %>%
 green_data %>% 
   select(green2, green2r)
 
+# compute total scores
+
+green_data <- 
+  green_data %>% 
+  rowwise() %>% 
+  mutate(green_tot = mean(c(green1, green2r, green3, green4, green5), na.rm = TRUE),
+         comp_tot = mean(c(comp1, comp2, comp3, comp4, comp5, comp6r, comp7r, comp8r, comp9r, comp10r), 
+                         na.rm = TRUE),
+         intel_tot = mean(c(intel1, intel2, intel3, intel4, intel5, intel6, intel7r, intel8r, intel9r, intel10r),
+                          na.rm = TRUE),
+         open_tot = mean(c(open1, open2, open3, open4, open5, open6, open7r, open8r, open9r, open10r), 
+                         na.rm = TRUE)) %>% 
+  ungroup()
+         
+
+
 ```
+
+# Question 3: Rescaling using POMP
 
   3. Rescale the variables so that they go from 0-100 instead of the original range.
      Name the recaled variables `*_pomp`.
+     
+```{r pomp}
+
+# computing pomp scores (100*(raw-min)/(max-min))
+
+green_data <- 
+  green_data %>%
+  rowwise() %>% 
+  mutate(green_pomp = (100*(green_tot - 1))/(5-1), na.rm = TRUE,
+         comp_pomp = (100*(comp_tot - 1))/(5-1), na.rm = TRUE,
+         intel_pomp = (100*(intel_tot - 1))/(5-1), na.rm = TRUE,
+         open_pomp = (100*(open_tot - 1))/(5-1), na.rm = TRUE) %>% 
+  ungroup()
+
+
+```
+
+
+# Question 4: distribution plots
+
   4. Make plots that illustrate the distributions of the 4 POMP-scored variables.
+  
+```{r pomp plots}
+
+ggplot(green_data) +
+  aes(x = green_pomp) +
+  geom_bar()
+
+ggplot(green_data) +
+  aes(x = comp_pomp) +
+  geom_histogram(binwidth = 1.5)
+
+ggplot(green_data) +
+  aes(x = intel_pomp) +
+  geom_bar()
+
+ggplot(green_data) +
+  aes(x = open_pomp) +
+  geom_bar()
+
+
+```
+
+# Question 5: scatterplots
+
   5. Make scatterplots showing the relationships between **green reputation** and each personality trait.
      Include trend lines for **students** and **non-students**.
      What do these plots show?
+     
+```{r scatters}
+
+green_data %>% 
+  filter(!is.na(student)) %>% 
+  ggplot() +
+  aes(x = comp_pomp,
+      y = green_pomp,
+      group = student,
+      color = student,
+      fill = student) +
+  geom_jitter() +
+  geom_smooth(method = "lm")
+  
+
+green_data %>% 
+  filter(!is.na(student)) %>% 
+  ggplot() +
+  aes(x = intel_pomp,
+      y = green_pomp,
+      group = student,
+      color = student,
+      fill = student) +
+  geom_jitter() +
+  geom_smooth(method = "lm")
+
+  
+green_data %>% 
+  filter(!is.na(student)) %>% 
+  ggplot() +
+  aes(x = open_pomp,
+      y = green_pomp,
+      group = student,
+      color = student,
+      fill = student) +
+  geom_jitter() +
+  geom_smooth(method = "lm")
+
+```
+
   6. Compare **green reputation** for students and non-students using a **rainfall plot** (bar + density + data points).
   7. Compute a summary table of means, SDs, medians, minima, and maxima for the four total scores for students and non-students.
   
