@@ -3,8 +3,8 @@ title: "hw03"
 author: "Greg Rousis"
 date: "2/18/2021"
 output: 
-  html_document: default
   github_document: default
+  html_document: default
 editor_options: 
   chunk_output_type: console
 ---
@@ -16,6 +16,7 @@ setwd("C:/Users/Greg Rousis/GitHub/hw-gregrousis/hw03")
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(reshape2)
+library(kableExtra)
 theme_set(theme_classic())
 
 ```
@@ -33,6 +34,8 @@ print(dictionary, n = 36)
 
 ```
 
+
+
 # Question 1: inspect item responses
 
   1. Inspect the item responses (e.g., with graphs or by summarizing distinct values). 
@@ -43,9 +46,10 @@ green_data %>%
   summary()
 ```
 
-## There are some -99's, which need to be recoded as missing
 
-```{r data inspection}
+### There are some -99's, which need to be recoded as missing
+
+```{r missing data}
 
 green_data <- green_data %>% 
   mutate_at(vars(comp1:student),
@@ -63,7 +67,6 @@ green_data <-
   )
 
   
-  
 melt.green <- melt(green_data)
 
 head(melt.green)
@@ -74,6 +77,7 @@ ggplot(melt.green) +
   facet_wrap(~variable, 
              scales = "free")
 ```
+
 
 
 # Question 2: compute total scores
@@ -119,6 +123,8 @@ green_data <-
 
 ```
 
+
+
 # Question 3: Rescaling using POMP
 
   3. Rescale the variables so that they go from 0-100 instead of the original range.
@@ -139,6 +145,7 @@ green_data <-
 
 
 ```
+
 
 
 # Question 4: distribution plots
@@ -166,19 +173,28 @@ ggplot(green_data) +
 
 ```
 
+
+
 # Question 5: scatterplots
 
   5. Make scatterplots showing the relationships between **green reputation** and each personality trait.
      Include trend lines for **students** and **non-students**.
      What do these plots show?
      
+  **Answer:** green reputation is positively correlated with all 3 personality variables. However, the association 
+  appears to differ between students and non-students. Compassion is positively associated with green reputation among
+  both students and non-students, but students appear to report higher mean levels of compassion than non-students. 
+  Green reputation is positively associated with intellectual curiosity among students, but seems to  have little 
+  association with intellectual curiosity among non-students. Likewise, the association between green repuatation and 
+  openness is seemingly stronger among students than non-students. 
+     
 ```{r scatters}
 
 green_data %>% 
   filter(!is.na(student)) %>% 
   ggplot() +
-  aes(x = comp_pomp,
-      y = green_pomp,
+  aes(y = comp_pomp,
+      x = green_pomp,
       group = student,
       color = student,
       fill = student) +
@@ -189,8 +205,8 @@ green_data %>%
 green_data %>% 
   filter(!is.na(student)) %>% 
   ggplot() +
-  aes(x = intel_pomp,
-      y = green_pomp,
+  aes(y = intel_pomp,
+      x = green_pomp,
       group = student,
       color = student,
       fill = student) +
@@ -201,8 +217,8 @@ green_data %>%
 green_data %>% 
   filter(!is.na(student)) %>% 
   ggplot() +
-  aes(x = open_pomp,
-      y = green_pomp,
+  aes(y = open_pomp,
+      x = green_pomp,
       group = student,
       color = student,
       fill = student) +
@@ -211,7 +227,74 @@ green_data %>%
 
 ```
 
-  6. Compare **green reputation** for students and non-students using a **rainfall plot** (bar + density + data points).
-  7. Compute a summary table of means, SDs, medians, minima, and maxima for the four total scores for students and non-students.
+
+
+# Question 6: rainfall plots
+  6. Compare **green reputation** for students and non-students using a **rainfall plot** (bar + density + data
+  points).
+  
+  **answer:** Non-students appear to have a bimodal distribution of green reputation: one mode is around 50 (out of
+  100) and another around 75 (out of 100). For students, green reputation resembles a more normal distribution.
+  
+  
+```{r rainfall}
+
+green_data %>% 
+  filter(!is.na(student)) %>% 
+ggplot() +
+  aes(y = student,
+      x = green_pomp,
+      fill = student,
+      color = student) +
+  geom_jitter(height = .15) +
+  geom_boxplot(color = "black",
+               alpha = .5,
+               width = .1,
+               size = .5) +
+  ggdist::stat_slab(height = .3,
+                    color = "black",
+                    size = .2,
+                    alpha = .5,
+                    position = position_nudge(y = .2))
+
+```
+
+  
+  
+# Question 7: summary table
+
+  7. Compute a summary table of means, SDs, medians, minima, and maxima for the four total scores for students and
+  non-students.
+  
+```{r table}
+
+tab <- green_data %>% 
+  na.omit() %>% 
+  group_by(student) %>% 
+  summarize(mean_green = mean(green_pomp),
+            sd_green = sd(green_pomp),
+            median_green = median(green_pomp),
+            min_green = min(green_pomp),
+            max_green = max(green_pomp),
+            mean_comp = mean(comp_pomp),
+            sd_comp = sd(comp_pomp),
+            median_comp = median(comp_pomp),
+            min_comp = min(comp_pomp),
+            max_comp = max(comp_pomp),
+            mean_intel = mean(intel_pomp),
+            sd_intel = sd(intel_pomp),
+            median_intel = median(intel_pomp),
+            min_intel = min(intel_pomp),
+            max_intel = max(intel_pomp),
+            mean_open = mean(open_pomp),
+            sd_open = sd(open_pomp),
+            median_open = median(open_pomp),
+            min_open = min(open_pomp),
+            max_open = max(open_pomp))
+
+kable(tab)
+
+```
+
   
 In your assignment, prepare an RMarkdown file that includes both the coding and (for 4-7) narrative descriptions of your results.
