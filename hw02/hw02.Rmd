@@ -3,8 +3,8 @@ title: "hw02"
 author: "Greg Rousis"
 date: "2/4/2021"
 output: 
-  html_document: default
   github_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -23,20 +23,20 @@ library(palmerpenguins)
 #Exercises 1.1 and 1.2
 
 gapminder %>% 
-  filter(country == "Afghanistan" | country == "Iraq" | country == "Syria") %>% # BMW: This works, but country %in% c("Afghanistan", "Iraq", "Syria") might be easier to work with.
+  filter(country %in% c("Afghanistan", "Iraq", "Syria")) %>% 
   select(country, gdpPercap)
 
 #Exercise 1.3
 
 gapminder %>% 
   mutate(lifExpChange = lifeExp - lag(lifeExp)) %>% 
-  filter(lifExpChange < 0) # BMW: Great work!
+  filter(lifExpChange < 0)
 
 #Exercise 1.4
 
 gapminder %>% 
   group_by(country) %>% 
-  slice_max(gdpPercap) # BMW: Look at that! A function I didn't know about!
+  slice_max(gdpPercap) 
 
 #Exercise 1.5
 
@@ -47,7 +47,7 @@ gapminder %>%
       y = gdpPercap) +
   geom_point() +
   scale_y_log10("GDP per capita", labels = scales::comma) +
-  xlab("Life Expectancy") + # BMW: Very nice!
+  xlab("Life Expectancy") + 
   theme_classic()
 ```
 
@@ -80,7 +80,7 @@ ggplot(penguins) +
   ylab("Bill Length (mm)") +
   xlab("Body mass (grams)") +
   theme_classic() +
-  theme(legend.position = "bottom") # BMW: Very nice!
+  theme(legend.position = "bottom")
 
 #Exercise 2.2
 
@@ -111,7 +111,7 @@ penguins %>%
       y = flipper_length_mm,
       fill = sex,
       color = sex) +
-  geom_jitter(height = 0, width = .1) + # BMW: When you geom_jitter() with a categorical and continuous variable, don't jitter along the axis of the continuous variable and adjust the jitter width for the categorical axis to avoid the two subgroups overlapping.
+  geom_jitter(height = 0, width = 0.4) + # BMW: When you geom_jitter() with a categorical and continuous variable, don't jitter along the axis of the continuous variable and adjust the jitter width for the categorical axis to avoid the two subgroups overlapping.
   geom_boxplot(alpha = 0.4) +
   ylab("Flipper Length (mm)") +
   theme_classic()
@@ -124,7 +124,7 @@ penguins %>%
       y = flipper_length_mm,
       fill = island,
       color = island) +
-  geom_jitter(height = 0, width = .1) +
+  geom_jitter(height = 0, width = .4) +
   geom_boxplot(alpha = 0.4) +
   ylab("Flipper Length (mm)") +
   theme_classic()
