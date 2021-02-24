@@ -16,6 +16,7 @@ setwd("C:/Users/Greg Rousis/GitHub/hw-gregrousis/hw03")
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(reshape2)
+library(gridExtra)
 library(kableExtra)
 theme_set(theme_classic())
 
@@ -152,24 +153,34 @@ green_data <-
 
   4. Make plots that illustrate the distributions of the 4 POMP-scored variables.
   
+  **Answer:** Comp and openness seem skewed, and intellectual curiosity has a bimodal distribution. Green reputation
+  seems the closest to a normal distribution.
+  
 ```{r pomp plots}
 
-ggplot(green_data) +
+#creating plots to inspect data
+green_plot <- 
+  ggplot(green_data) +
   aes(x = green_pomp) +
   geom_bar()
 
-ggplot(green_data) +
+comp_plot <- 
+  ggplot(green_data) +
   aes(x = comp_pomp) +
   geom_histogram(binwidth = 1.5)
 
-ggplot(green_data) +
+intel_plot <- 
+  ggplot(green_data) +
   aes(x = intel_pomp) +
   geom_bar()
 
-ggplot(green_data) +
+open_plot <- 
+  ggplot(green_data) +
   aes(x = open_pomp) +
   geom_bar()
 
+#arranging data
+grid.arrange(green_plot, comp_plot, intel_plot, open_plot)
 
 ```
 
@@ -292,6 +303,7 @@ tab <- green_data %>%
             min_open = min(open_pomp),
             max_open = max(open_pomp))
 
+  
 kable(tab)
 
 ```
