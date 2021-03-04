@@ -51,7 +51,7 @@ beer_data$`Average ABV` <- as.double(beer_data$`Average ABV`)
 beer_data
 
 write_csv(
-  beer_dat,
+  beer_data,
   here::here("participation", "data", "beer_data.csv")
 )
   
@@ -77,22 +77,39 @@ ggplot(beer_data) +
 ```{r summary}
 
 beer_data %>% 
-  summarize(across(
-    where(is.double),
-    list(
-      mean = ~mean(.x, na.rm = TRUE),
-      sd = ~sd(.x, na.rm = TRUE)),
-    .names = "{.col}.{.fn}")
-  )
+summarize(across(
+  where(is.double),
+  list(
+    mean = ~mean(.x, na.rm = TRUE),
+    sd = ~sd(.x, na.rm = TRUE)),
+  .names = "{.col}.{.fn}")
+) 
 
 
-   
+beer_data %>% 
+  select(-`Beer Category`) %>% 
+  cor(use = "pairwise.complete.obs")
 
-
-
-list(mean = mean, sd = sd, na.rm = TRUE)
 
 
 ```
 
   5. Describe the results.
+  
+  **Answer:** I couldn't figure out how to get the correlation and summary stats in one table, but in any case, there
+  is a pretty robust association between alcohol content and average rating. The more alcohol the beer has, the more
+  people tended to like it. It could be because, when rating the highly alcoholic beer, they're drunk, thus making it
+  more likely that they'll say they enjoy it. There does seem to be a ceiling effect though - lots of high ratings, but
+  very few low ratings.
+  
+&nbsp;  
+&nbsp;  
+&nbsp;  
+  
+  
+  
+  
+  
+  
+  
+  
