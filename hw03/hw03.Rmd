@@ -12,10 +12,8 @@ editor_options:
 ```{r setup, include=FALSE}
 #loading required packages
 
-setwd("C:/Users/Greg Rousis/GitHub/hw-gregrousis/hw03")
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
-library(reshape2)
 library(gridExtra)
 library(kableExtra)
 theme_set(theme_classic())
@@ -53,8 +51,8 @@ green_data %>%
 ```{r missing data}
 
 green_data <- green_data %>% 
-  mutate_at(vars(comp1:student),
-            ~ifelse(. == -99, NA, .)
+  mutate(across(comp1:student, # BMW: mutate_at() is retired. Prefer across() instead.
+            ~ifelse(. == -99, NA, .))
   )
 
 green_data %>% 
@@ -62,21 +60,9 @@ green_data %>%
 
 green_data <- 
   green_data %>% 
-  mutate(student = factor(student, levels = c(1, 2))) %>% 
-  mutate(
-    student = recode(student, "1" = "Not a student", "2" = "Student")
-  )
+  mutate(student = factor(student, levels = c(1, 2), labels = c("Not a student", "Student"))) # BMW: A somewhat simpler approach
 
-  
-melt.green <- melt(green_data)
 
-head(melt.green)
-
-ggplot(melt.green) +
-  aes(x = value) +
-  geom_histogram() +
-  facet_wrap(~variable, 
-             scales = "free")
 ```
 
 
@@ -108,20 +94,58 @@ green_data %>%
 
 # compute total scores
 
-green_data <- 
-  green_data %>% 
-  rowwise() %>% 
-  mutate(green_tot = mean(c(green1, green2r, green3, green4, green5), na.rm = TRUE),
-         comp_tot = mean(c(comp1, comp2, comp3, comp4, comp5, comp6r, comp7r, comp8r, comp9r, comp10r), 
-                         na.rm = TRUE),
-         intel_tot = mean(c(intel1, intel2, intel3, intel4, intel5, intel6, intel7r, intel8r, intel9r, intel10r),
-                          na.rm = TRUE),
-         open_tot = mean(c(open1, open2, open3, open4, open5, open6, open7r, open8r, open9r, open10r), 
-                         na.rm = TRUE)) %>% 
+green_data <-
+  green_data %>%
+  rowwise() %>%
+  mutate(
+    green_tot = mean(c(green1, green2r, green3, green4, green5), na.rm = TRUE),
+    comp_tot = mean(
+      c(
+        comp1,
+        comp2,
+        comp3,
+        comp4,
+        comp5,
+        comp6r,
+        comp7r,
+        comp8r,
+        comp9r,
+        comp10r
+      ),
+      na.rm = TRUE
+    ),
+    intel_tot = mean(
+      c(
+        intel1,
+        intel2,
+        intel3,
+        intel4,
+        intel5,
+        intel6,
+        intel7r,
+        intel8r,
+        intel9r,
+        intel10r
+      ),
+      na.rm = TRUE
+    ),
+    open_tot = mean(
+      c(
+        open1,
+        open2,
+        open3,
+        open4,
+        open5,
+        open6,
+        open7r,
+        open8r,
+        open9r,
+        open10r
+      ),
+      na.rm = TRUE
+    )
+  ) %>%
   ungroup()
-         
-
-
 ```
 
 
@@ -137,14 +161,11 @@ green_data <-
 
 green_data <- 
   green_data %>%
-  rowwise() %>% 
   mutate(green_pomp = (100*(green_tot - 1))/(5-1), na.rm = TRUE,
          comp_pomp = (100*(comp_tot - 1))/(5-1), na.rm = TRUE,
          intel_pomp = (100*(intel_tot - 1))/(5-1), na.rm = TRUE,
          open_pomp = (100*(open_tot - 1))/(5-1), na.rm = TRUE) %>% 
   ungroup()
-
-
 ```
 
 
@@ -180,7 +201,7 @@ open_plot <-
   geom_bar()
 
 #arranging data
-grid.arrange(green_plot, comp_plot, intel_plot, open_plot)
+grid.arrange(green_plot, comp_plot, intel_plot, open_plot) # BMW: We will look at this next week, but check out the patchwork package for an elegant approach this this. 
 
 ```
 
