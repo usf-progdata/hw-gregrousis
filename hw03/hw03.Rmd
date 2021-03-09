@@ -12,10 +12,8 @@ editor_options:
 ```{r setup, include=FALSE}
 #loading required packages
 
-setwd("C:/Users/Greg Rousis/GitHub/hw-gregrousis/hw03") # BMW: Never, ever use setwd() ;)
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
-library(reshape2) # BMW: I recommend against reshape2. It's retired and no longer maintained. Use tidyr::pivot_longer() etc. instead. Especially don't use reshpae2 and tidyverse in the same script.
 library(gridExtra)
 library(kableExtra)
 theme_set(theme_classic())
@@ -64,16 +62,7 @@ green_data <-
   green_data %>% 
   mutate(student = factor(student, levels = c(1, 2), labels = c("Not a student", "Student"))) # BMW: A somewhat simpler approach
 
-  
-melt.green <- melt(green_data) # BMW: As above, use pivot_longer() instead. 
 
-head(melt.green) # BMW: Don't include "check" views like this in your final script. 
-
-ggplot(melt.green) +
-  aes(x = value) +
-  geom_histogram() +
-  facet_wrap(~variable, 
-             scales = "free")
 ```
 
 
@@ -172,7 +161,6 @@ green_data <-
 
 green_data <- 
   green_data %>%
-  rowwise() %>% # BMW: You don't need rowwise() here. All of the operations you are doing are vectorized. 
   mutate(green_pomp = (100*(green_tot - 1))/(5-1), na.rm = TRUE,
          comp_pomp = (100*(comp_tot - 1))/(5-1), na.rm = TRUE,
          intel_pomp = (100*(intel_tot - 1))/(5-1), na.rm = TRUE,
