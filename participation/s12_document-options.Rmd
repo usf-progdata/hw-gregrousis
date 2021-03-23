@@ -1,12 +1,22 @@
 ---
 title: "Beautifying RMarkdown"
-author: "Your Name Here"
-date: "1990-05-31"
-output: html_document
+author: "Greg Rousis"
+date: "`r format(Sys.Date(), '%b %d %Y')`"
+output: 
+  html_document:
+    theme: readable
+    highlight: haddock
+    code folding: hide
+    toc: true
+    toc_float: true
+    toc_depth: 3
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
+library(ggplot2)
+library(tidyverse)
+library(kableExtra)
 ```
 
 ## The Surprising Truth about `mpg`
@@ -15,6 +25,22 @@ knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
 
 Add a code chunk that uses the `ggplot2::mpg` dataset to plot `displ` against `hwy` (highway mpg), with points colored by `manufacturer` and shaped by `year`.
 
+```{r mpg figure}
+
+mpg <- ggplot2::mpg
+mpg$year <- as.factor(mpg$year)
+
+ggplot(mpg) +
+  aes(y = hwy,
+      x = displ,
+      color = manufacturer,
+      shape = year) +
+  geom_point() +
+  theme_classic()
+
+```
+
+
 ### `mpg`: The Table
 
 Add a second code chunk that gives a summary table with the **mean** and **sd** for `displ` and `hwy` for each year.
@@ -22,6 +48,25 @@ Add a second code chunk that gives a summary table with the **mean** and **sd** 
 Around each piece of output, add a brief description.
 
 We will examine how various options change the rendered HTML output.
+
+```{r mpg table}
+
+mpg_tab <- mpg %>% 
+  group_by(year) %>% 
+  summarize(
+    across(
+      c(displ, hwy),
+      list(
+        mean = mean,
+        sd = sd)
+    )
+  )
+
+  
+kable(mpg_tab)
+
+```
+
 
 
 ## Resources
@@ -92,6 +137,7 @@ Do that by writing (in quotes), for example:
 
   - '`r 1 + 2`' where `1 + 2` is the R code you want to run
   - (if you are looking at this in the knit HTML, that's `` '`r knitr::inline_expr("1 + 2")`' ``)
+  
 
 Change the `date` field in YAML to be dynamically generated with today's date by running this R expression in the `date` field:
 
@@ -160,6 +206,18 @@ You can control height and width of figures in a chunk (in inches) with `fig.wid
 
 Change your plot chunk's figure dimensions and see what happens.
 
+```{r plot, echo=FALSE, fig.width=9, fig.height=7}
+
+ggplot(mpg) +
+  aes(y = hwy,
+      x = displ,
+      color = manufacturer,
+      shape = year) +
+  geom_point() +
+  theme_classic()
+```
+
+
 ### Graphic Device and DPI
 
 By default, RMarkdown will save images as PNG (a bitmap format). 
@@ -170,6 +228,20 @@ For example, `dpi=300`.
 This mostly doesn't matter for HTML output, but if you output to Word or PDF, you will want to specify a DPI of 300.
 
 Try changing the graphics device for your plot chunk to `"svglite"`.
+
+I couldnt get `"svglite"` to run, but was able to run `"svg"`
+
+```{r svg plot, dev= "svg", echo=FALSE, fig.width=9, fig.height=7}
+
+ggplot(mpg) +
+  aes(y = hwy,
+      x = displ,
+      color = manufacturer,
+      shape = year) +
+  geom_point() +
+  theme_classic()
+```
+
 
 ### Caching
 
@@ -196,7 +268,7 @@ If you want to allow knitting to continue even if there's an error, set the `err
 Try it out!
 Change this chunk's `eval=FALSE` to `error=TRUE`.
 
-```{r error!, eval=FALSE}
+```{r error!, error=TRUE}
 stop("This is a scary error!")
 ```
 
@@ -213,9 +285,9 @@ To render such output, set the `results` option to `'asis'`.
 Try it out! 
 Add `results='asis'` to this chunk and see how the output changes.
 
-```{r try out 'asis' output}
+```{r results='asis'}
 cat("$$
-\operatorname{mpg} = \alpha + \beta_{1}(\operatorname{cyl}) + \beta_{2}(\operatorname{disp}) + \epsilon
+\\operatorname{mpg} = \\alpha + \\beta_{1}(\\operatorname{cyl}) + \\beta_{2}(\\operatorname{disp}) + \\epsilon
 $$")
 ```
 
