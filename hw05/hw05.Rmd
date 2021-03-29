@@ -1,8 +1,17 @@
 ---
 title: "Consequences of Covid-19 for Candle Critiques"
-author: "Your Name Here"
-date: "3/22/2021"
-output: html_document
+author: "Greg Rousis"
+date: "`r format(Sys.Date(), '%b %d %Y')`"
+output: 
+  html_document:
+    theme: readable
+    highlight: haddock
+    code folding: show
+    toc: true
+    toc_float: true
+    toc_depth: 3
+  github_document: default
+    
 ---
 
 For this assignment, you will produce a report exploring the impact of Covid-19 on scented candle ratings.
@@ -26,7 +35,15 @@ Each dataset contains the following information for the Top 3 selling scented or
   4. `Review`: For the scented candles, the text of the review.
 
 ```{r setup, include=FALSE}
-library(dplyr)
+
+library(tidyverse)
+library(readxl)
+library(patchwork)
+theme_set(theme_classic())
+
+candles_scented <- read_excel("Scented_all.xlsx")
+candles_unscented <- read_excel("Unscented_all.xlsx")
+
 ```
 
 
@@ -55,7 +72,45 @@ Note: The raw data are **individual reviews** so you will need to compute summar
 Interpret these graphs.
 What do they show about scented candles over the time period?
 
-```{r}
+```{r separate plots}
+
+p1 <- candles_scented %>% 
+  filter(Date >= "2017-01-01") %>% 
+  group_by(Date) %>% 
+  mutate(Rating_Avg = mean(Rating)) %>%
+  distinct(Date,
+           .keep_all = TRUE) %>% 
+  ggplot() +
+  aes(x = Date,
+      y = Rating_Avg) +
+  geom_point(alpha = 0.1) +
+  geom_smooth(method = "loess") +
+  scale_x_datetime(date_breaks = "6 months",
+                   date_labels = "%m-%Y") +
+  scale_fill_brewer() +
+  ylab(label = "Average Daily Rating")+
+  ggtitle(label = "Average Daily Ratings\n of Scented Candles")
+
+p2 <- candles_unscented %>% 
+  filter(Date >= "2017-01-01") %>% 
+  group_by(Date) %>% 
+  mutate(Rating_Avg = mean(Rating)) %>%
+  distinct(Date,
+           .keep_all = TRUE) %>% 
+  ggplot() +
+  aes(x = Date,
+      y = Rating_Avg) +
+  geom_point(alpha = 0.1) +
+  geom_smooth(method = "loess") +
+  scale_x_datetime(date_breaks = "6 months",
+                   date_labels = "%m-%Y") +
+  scale_fill_brewer() +
+  ylab(label = "Average Daily Rating")+
+  ggtitle(label = "Average Daily Ratings\n of Uncented Candles")
+
+
+
+p1 + p2
 
 ```
 
@@ -66,14 +121,31 @@ Combine the two datasets into one and make a plot similar to above, but showing 
 Distinguish scented versus unscented candles using color, shape, and line type (for the trend lines).
 
 ```{r combine datasets, eval=FALSE}
+
 candles_full <- bind_rows(
-	scented = candeles_scented, 
-	unscented = candeles_unscented, 
+	scented = candles_scented, 
+	unscented = candles_unscented, 
 	.id = "Scented"
 )
+
 ```
 
 ```{r}
+
+test <- candles_full %>% 
+  filter(Date >= "2017-01-01") %>% 
+  group_by(Date, Scented) %>% 
+  mutate(Rating_Avg = mean(Rating)) %>%
+  distinct(Date,
+           .keep_all = TRUE)
+
+ggplot(test) +
+  aes(x = Date,
+      y = Rating_Avg,
+      color = Scented,
+      group = Scented) +
+  geom_point()+
+  geom_smooth(method = "loess")
 
 ```
 
