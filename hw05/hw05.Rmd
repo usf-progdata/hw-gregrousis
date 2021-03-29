@@ -83,13 +83,18 @@ p1 <- candles_scented %>%
   ggplot() +
   aes(x = Date,
       y = Rating_Avg) +
-  geom_point(alpha = 0.1) +
+  geom_point(shape = 1, 
+             alpha = 0.2) +
+  geom_vline(xintercept = as.POSIXct(as.Date("2020-01-20")),
+             linetype = 4) +
   geom_smooth(method = "loess") +
   scale_x_datetime(date_breaks = "6 months",
                    date_labels = "%m-%Y") +
-  scale_fill_brewer() +
   ylab(label = "Average Daily Rating")+
-  ggtitle(label = "Average Daily Ratings\n of Scented Candles")
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  ggtitle(label = "Average Daily Ratings\n of Scented Candles") +
+  theme(plot.title = element_text(hjust = 0.5))
+
 
 p2 <- candles_unscented %>% 
   filter(Date >= "2017-01-01") %>% 
@@ -100,13 +105,19 @@ p2 <- candles_unscented %>%
   ggplot() +
   aes(x = Date,
       y = Rating_Avg) +
-  geom_point(alpha = 0.1) +
+  geom_vline(xintercept = as.numeric(as.Date("2020-01-20"))) +
+  geom_vline(xintercept = as.POSIXct(as.Date("2020-01-20")),
+             linetype = 4) +
+  geom_point(shape = 1,
+             alpha = 0.2) +
   geom_smooth(method = "loess") +
   scale_x_datetime(date_breaks = "6 months",
                    date_labels = "%m-%Y") +
   scale_fill_brewer() +
   ylab(label = "Average Daily Rating")+
-  ggtitle(label = "Average Daily Ratings\n of Uncented Candles")
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  ggtitle(label = "Average Daily Ratings\n of Unscented Candles") +
+  theme(plot.title = element_text(hjust = 0.5))
 
 
 
@@ -132,24 +143,40 @@ candles_full <- bind_rows(
 
 ```{r}
 
-test <- candles_full %>% 
+candles_full <- bind_rows(
+	scented = candles_scented, 
+	unscented = candles_unscented, 
+	.id = "Scented"
+)
+
+full_filtered <- candles_full %>% 
   filter(Date >= "2017-01-01") %>% 
   group_by(Date, Scented) %>% 
   mutate(Rating_Avg = mean(Rating)) %>%
   distinct(Date,
            .keep_all = TRUE)
 
-ggplot(test) +
+ggplot(full_filtered) +
   aes(x = Date,
       y = Rating_Avg,
       color = Scented,
-      group = Scented) +
-  geom_point()+
-  geom_smooth(method = "loess")
+      group = Scented,
+      linetype = Scented) +
+  geom_vline(xintercept = as.POSIXct(as.Date("2020-01-20")),
+             linetype = 4) +
+  geom_point(shape = 1,
+             alpha = 0.2)+
+  geom_smooth(method = "loess",
+              se = FALSE) +
+  ylab(label = "Average Daily Rating") +
+  ggtitle(label = "Average Daily Ratings\n of Scented and Unscented Candles") +
+  theme(plot.title = element_text(hjust = 0.5))
 
 ```
 
 Which of these two sets of plots do you find easier to interpret?
+
+I think the 
 
 
 ## Part 3: Proportion of reviews mentioning "no scent"
@@ -193,6 +220,8 @@ str_no_scent <- function(x){
 ```
 
 ```{r}
+
+str_no_scent(candles_scented)
 
 ```
 
