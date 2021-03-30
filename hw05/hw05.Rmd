@@ -3,6 +3,8 @@ title: "Consequences of Covid-19 for Candle Critiques"
 author: "Greg Rousis"
 date: "`r format(Sys.Date(), '%b %d %Y')`"
 output: 
+  github_document: default
+    
   html_document:
     theme: readable
     highlight: haddock
@@ -10,8 +12,6 @@ output:
     toc: true
     toc_float: true
     toc_depth: 3
-  github_document: default
-    
 ---
 
 For this assignment, you will produce a report exploring the impact of Covid-19 on scented candle ratings.
@@ -176,7 +176,7 @@ ggplot(full_filtered) +
 
 Which of these two sets of plots do you find easier to interpret?
 
-I think the 
+I think both tell the story that scented candles started performing worse once COVID and its attendant olfactory effects kicked in, athough it's easier to see the relative trend when both scented and unscented reviews are in the same graph.
 
 
 ## Part 3: Proportion of reviews mentioning "no scent"
@@ -221,10 +221,36 @@ str_no_scent <- function(x){
 
 ```{r}
 
-str_no_scent(candles_scented)
+candles_scented %>% 
+  filter(Date > "2019-01-01", Date < "2021-01-01") %>% 
+  mutate(month = lubridate::floor_date(Date, "month")) %>% 
+  mutate(noscent = str_no_scent(Review)) %>% 
+  group_by(month, noscent) %>% 
+  summarize(n = n()) %>% 
+  mutate(prop = n/sum(n)) %>% 
+  filter(noscent == 1) %>% 
+  ggplot() +
+  aes(x = month,
+      y = prop) +
+  geom_bar(stat = "identity") +
+  scale_x_datetime(date_breaks = "1 month",
+                   date_labels = "%m-%Y") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  ylab(label = "Propotion of reviews mentioning no scent")
+
+
+
 
 ```
 
-What pattern do you see?
+What pattern do you see? 
+
+It looks like a lot of complaints came in the winter months of 2019 (cold and flu season), but are much more consistent in 2020, likely reflecting the impact of COVID.
+
 Is there a trend over time regarding smell-related reviews? 
-How does 2020 compare to 2019?
+
+I think the trend of people not being able to smell candles mirrors the occurrence of allergy season, cold and flu season, and then the onset of COVID.
+
+How does 2020 compare to 2019? 
+
+It looks like the proportion of people complaining that their candles don't smell is larger in 2020 moths relative to 2019.
