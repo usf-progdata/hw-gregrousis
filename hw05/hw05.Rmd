@@ -3,7 +3,6 @@ title: "Consequences of Covid-19 for Candle Critiques"
 author: "Greg Rousis"
 date: "`r format(Sys.Date(), '%b %d %Y')`"
 output: 
-  github_document: default
   html_document:
     theme: readable
     highlight: haddock
@@ -11,6 +10,7 @@ output:
     toc: true
     toc_float: true
     toc_depth: 3
+  github_document: default
 ---
 
 
@@ -183,17 +183,13 @@ str_no_scent <- function(x){
 candles_scented %>% 
   filter(Date >= "2019-01-01", Date < "2021-01-01") %>% 
   mutate(Month = lubridate::floor_date(Date, "month")) %>% 
-  mutate(noscent = str_no_scent(Review)) %>% 
-  group_by(Month, noscent) %>% 
-  summarize(n = n()) %>% 
-  mutate(prop = n/sum(n)) %>%
-  mutate(Year = as.factor(ifelse(Month > "2019-12-01", 2020, 2019))) %>% 
-  filter(noscent == 1) %>% 
+  mutate(noscent = str_no_scent(Review)) %>%
+  mutate(Year = as.factor(ifelse(Month > "2019-12-01", 2020, 2019))) %>%
   ggplot() +
   aes(x = Month,
-      y = prop,
-      fill = Year) +
-  geom_bar(stat = "identity") +
+      y = noscent,
+      color = Year) +
+  stat_summary(aes(y = noscent), fun.data = mean_cl_normal)+
   scale_x_datetime(date_breaks = "1 month",
                    date_labels = "%m-%Y") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
