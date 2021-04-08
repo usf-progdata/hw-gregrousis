@@ -16,6 +16,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(gridExtra)
 library(kableExtra)
+library(patchwork)
 theme_set(theme_classic())
 
 ```
@@ -51,7 +52,7 @@ green_data %>%
 ```{r missing data}
 
 green_data <- green_data %>% 
-  mutate(across(comp1:student, # BMW: mutate_at() is retired. Prefer across() instead.
+  mutate(across(comp1:student, 
             ~ifelse(. == -99, NA, .))
   )
 
@@ -201,7 +202,8 @@ open_plot <-
   geom_bar()
 
 #arranging data
-grid.arrange(green_plot, comp_plot, intel_plot, open_plot) # BMW: We will look at this next week, but check out the patchwork package for an elegant approach this this. 
+
+green_plot + comp_plot + intel_plot + open_plot
 
 ```
 
