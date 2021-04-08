@@ -139,7 +139,8 @@ ggplot(full_filtered) +
   geom_point(shape = 1,
              alpha = 0.5)+
   geom_smooth(method = "loess",
-              se = FALSE) +
+              se = FALSE,
+              size = 1.5) +
   ylab(label = "Average Daily Rating") +
   ggtitle(label = "Average Daily Ratings\n of Scented and Unscented Candles") +
   theme(plot.title = element_text(hjust = 0.5))
@@ -188,8 +189,11 @@ candles_scented %>%
   ggplot() +
   aes(x = Month,
       y = noscent,
-      color = Year) +
-  stat_summary(aes(y = noscent), fun.data = mean_cl_normal)+
+      color = Year,
+      shape = Year) +
+  stat_summary(aes(y = noscent), 
+               size = 1,
+               fun.data = mean_cl_normal)+
   scale_x_datetime(date_breaks = "1 month",
                    date_labels = "%m-%Y") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
