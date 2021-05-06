@@ -38,7 +38,7 @@ editor_options:
 
 ### **Histograms and Descriptives**
 
-### First, we'll examine the histograms of our variables of interest. I wrote a function for th histograms instead of rewriting the code for each plot. Precarious manhood - self and PM - close others mirror each other in terms of distributions, whereas PM- society is slightly skewed. No values are outside the expected range.
+### First, we'll examine the histograms of our variables of interest. I wrote a function for the histograms instead of rewriting the code for each plot. Precarious manhood - self and PM - close others mirror each other in terms of distributions, whereas PM- society is slightly skewed. No values are outside the expected range.
 
 
 ```r
@@ -186,7 +186,7 @@ tab1 %>%
 
 ### **Boxplots**
 
-### Again, I wrote a function for the univariate boxplots, just to see what the outlier situation was like. There are a few outliers in EI, interdependence, loneliness, and aggeression. Let's see how the scatterplots look.
+### Again, I wrote a function for the univariate boxplots, just to see what the outlier situation was like. There are a few outliers in EI, interdependence, loneliness, and aggeression.
 
 
 ```r
