@@ -413,7 +413,7 @@ mod1_jn_plot <- johnson_neyman(mod1,
 mod1_plot
 ```
 
-![](final_project_files/figure-html/regression mod1-1.png)<!-- -->
+![](final_project_files/figure-html/regression_mod1-1.png)<!-- -->
 
 ```r
 mod1_jn_plot
@@ -428,7 +428,7 @@ mod1_jn_plot
 ## Note: The range of observed values of PMClose is [1.00, 7.00]
 ```
 
-![](final_project_files/figure-html/regression mod1-2.png)<!-- -->
+![](final_project_files/figure-html/regression_mod1-2.png)<!-- -->
 
 
 ### **Exploratory Regression Model**
@@ -576,7 +576,7 @@ mod2_jn_plot <- johnson_neyman(mod2,
 mod2_plot
 ```
 
-![](final_project_files/figure-html/regression mod2-1.png)<!-- -->
+![](final_project_files/figure-html/regression_mod2-1.png)<!-- -->
 
 ```r
 mod2_jn_plot
@@ -591,5 +591,5 @@ mod2_jn_plot
 ## Note: The range of observed values of cmni is [1.43, 3.48]
 ```
 
-![](final_project_files/figure-html/regression mod2-2.png)<!-- -->
+![](final_project_files/figure-html/regression_mod2-2.png)<!-- -->
 

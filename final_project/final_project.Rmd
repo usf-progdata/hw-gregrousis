@@ -254,7 +254,7 @@ GGally::ggpairs(data_focal,
 
 ### Now we'll take a look at some regression models. Controlling for loneliness, the interaction of PM-Self and PM-close others is a significant predictor of EI. However, simple slope and Johnson-Neyman analyses reveal that the simple slope of PM-self predicting EI is only significant for men who reported PM-close between 1.00 and 1.18, a tiny subset of our sample. However, among these men (i.e., those who report very low PM beliefs among close friends/family), there is a positive association between PM-self and EI. That is, for men whose close friends/family do not endorse PM, the more they personally endorse PM beliefs, the more existentially isolated they feel. This makes sense given the theory of EI - feeling as though your experiences do not match those of other people causes EI.
 
-```{r regression mod1, error=FALSE, dpi=200}
+```{r regression_mod1, error=FALSE, dpi=200}
 
 
 mod1 <- lm(EI ~ lonely + PMSelf + PMClose + PMSelf*PMClose,
@@ -294,7 +294,7 @@ mod1_jn_plot
 ### Just for kicks, I was curious as to whether men who endorse PM and adhere strongly to masculine norms would report more aggressive behavior. This isn't a novel hypothesis by an means, but I wanted to confirm that pre-existing associations between masculinity and aggression were present in our data. The findings are consistent with this: among men who report high levels of conformity to masculine norms, the more they endorse PM, the more aggressive they are. For these men, both adhering to masculine norms and feeling as though their manhood status could be yannked away from them at a moment's notice play into aggressive behavior.
 
 
-```{r regression mod2, error=FALSE, dpi=200}
+```{r regression_mod2, error=FALSE, dpi=200}
 
 mod2 <- lm(agg ~ PMSelf + cmni + PMSelf*cmni,
            data = data)
