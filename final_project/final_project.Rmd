@@ -327,3 +327,7 @@ mod2_jn_plot
 
 ```
 
+
+## Summary
+
+### Our main hypothesized interaction did not fully replicate. However, there were some promising findings that I will follow up on in subsequent analyses.

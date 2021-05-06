@@ -593,3 +593,7 @@ mod2_jn_plot
 
 ![](final_project_files/figure-html/regression_mod2-2.png)<!-- -->
 
+
+## Summary
+
+### Our main hypothesized interaction did not fully replicate. However, there were some promising findings that I will follow up on in subsequent analyses.
