@@ -267,20 +267,23 @@ sim_slopes(mod1,
            modx = PMClose,
            johnson_neyman = TRUE)
 
-interact_plot(mod1, 
-              pred = PMSelf, 
-              modx = PMClose,
-              plot.points = TRUE,
-              partial.residuals = TRUE,
-              colors = "Dark2") +
+mod1_plot <- interact_plot(mod1, 
+                           pred = PMSelf, 
+                           modx = PMClose,
+                           plot.points = TRUE,
+                           partial.residuals = TRUE,
+                           colors = "Dark2") +
   xlab("Precarious Manhood - Self") +
   ylab("Existential Isolation") +
   theme_classic()
 
-johnson_neyman(mod1, 
-               pred = PMSelf, 
-               modx = PMClose,
-               alpha = .05)
+mod1_jn_plot <- johnson_neyman(mod1, 
+                               pred = PMSelf, 
+                               modx = PMClose,
+                               alpha = .05)
+
+mod1_plot
+mod1_jn_plot
 
 
 ```
@@ -304,21 +307,23 @@ sim_slopes(mod2,
            johnson_neyman = TRUE,
            control.fdr = TRUE)
 
-interact_plot(mod2, 
-              pred = PMSelf, 
-              modx = cmni,
-              plot.points = TRUE,
-              partial.residuals = TRUE,
-              colors = "Dark2") +
+mod2_plot <- interact_plot(mod2, 
+                           pred = PMSelf, 
+                           modx = cmni,
+                           plot.points = TRUE,
+                           partial.residuals = TRUE,
+                           colors = "Dark2") +
   xlab("Precarious Manhood - Self") +
   ylab("Aggression") +
   theme_classic()
 
-johnson_neyman(mod2, 
-               pred = PMSelf, 
-               modx = cmni,
-               alpha = .05)
+mod2_jn_plot <- johnson_neyman(mod2, 
+                               pred = PMSelf, 
+                               modx = cmni,
+                               alpha = .05)
 
+mod2_plot
+mod2_jn_plot
 
 ```
 
