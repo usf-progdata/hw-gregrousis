@@ -1,0 +1,333 @@
+---
+title: "Final Project"
+author: "Greg Rousis"
+date: "5/3/2021"
+output:
+  html_document:
+    keep_md: true
+    theme: paper
+editor_options: 
+  chunk_output_type: console
+---
+
+# Existential Isolation and Precarious Manhood
+
+### This project seeks to examine whether normative conceptions of masculinity are the underlying mechanism of the finding that men tend to experience more existential isolation (EI) than women. Existential isolation is the feeling of being subjctively alone in one's experiences. For example, not laughing at a joke that a group of people you're with would be an existentially isolating experience. Everyone experiences EI to some degree or another, but for those who are more existentially isolated, two fundamental human needs are stymied: the need to know and the need to belong. Thus, for some, EI is psychologically damaging and can have negative donwstream outcomes such as loneliness, depression, and anxiety.
+
+![EI meme](final_project_files/EI_meme.jpg)
+
+
+### In the West, men consistently report more EI than women. Previous research has suggested that this is driven largely by men's relatively lower endorsement of communal values. That is, men, compared to women, tend to report that they value communality less, and this in turn predicts men's endorsement of EI. However, in a previous study, we attempted to replicate these findings, and found that it was not communal norms that differentiated men and women, but rather a mismatch between participants' self-reported precariousness manhood (PM) beliefs and the extent to which they believed society endorsed PM. Precarious manhood is the idea that manhood, compared to womanhood, is a tenuous, desirable status that must be earned, is socially conferred, and can easily be lost. In our previous study, men who did not endorse PM beliefs but believed they were prevalent in American society were significantly higher in EI than those who endorsed PM beliefs or those who did not believe they were societally prevalent.
+
+
+![It's definitely you meme](final_project_files/its_you.png)
+
+
+### This study is a follow-up to attempt to replicate our previous findings and extend them to aggression, a consequence of threatened masculinty. Over the course of 3 semesters, we sampled 291 college students on a variety of scales, including EI, PM self beliefs, PM beliefs among close friends/family, PM beliefs in society, conformity to masculine norms, communality, interdependence, loneliness, and aggression.
+
+
+![Replication cat meme](final_project_files/replication_cat.jpg)
+
+
+```{r setup, echo=FALSE, include = FALSE}
+
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+library(tidyverse)
+library(patchwork)
+library(hablar)
+library(kableExtra)
+library(interactions)
+library(jtools)
+theme_set(theme_classic())
+```
+
+
+```{r data, include = FALSE}
+
+(data <- read_csv("data/EI_Manhood_Study2.csv")[-1:-2,])
+
+data <- data %>% 
+  select(!(Status:UserLanguage))
+
+data <- data %>% convert(dte(StartDate, EndDate),
+                 int(CV1:Agg29),
+                 fct(sex),
+                 int(age),
+                 fct(gender:ethnicity2),
+                 fct(english:eng_prof2),
+                 int(sexuality_1),
+                 fct(sexOrient:relationship),
+                 fct(kids),
+                 int(numKids),
+                 fct(finProvider:distracted))
+
+
+```
+
+```{r scales, include=FALSE}
+
+cmni_reverse <- c("CMNI4", "CMNI5", "CMNI6", "CMNI7", "CMNI9", "CMNI10", "CMNI12", "CMNI13", "CMNI15", "CMNI17", "CMNI23", "CMNI25", "CMNI27", "CMNI33", "CMNI34", "CMNI38", "CMNI40", "CMNI41")
+
+EI_reverse <- c("EI1", "EI2", "EI3", "EI6")
+
+Agg_reverse <- c("Agg15", "Agg24")
+
+
+data <- data %>%
+  mutate(
+    across(all_of(cmni_reverse),
+           ~  5-.x,
+           .names = "{.col}r")) %>% 
+  mutate(
+    across(all_of(EI_reverse),
+           ~  9-.x,
+           .names = "{.col}r")) %>% 
+  mutate(
+    across(all_of(Agg_reverse),
+           ~ 8 - .x,
+           .names = "{.col}r"))
+
+
+data <- data %>%
+  rowwise() %>% 
+  mutate(
+    communal = mean(c_across(CV1:CV12), na.rm = TRUE),
+    PMSelf = mean(c_across(PMSelf1:PMSelf7), na.rm = TRUE),
+    PMSoc = mean(c_across(PMSoc1:PMSoc7), na.rm = TRUE),
+    PMClose = mean(c_across(PMClose1:PMClose7), na.rm = TRUE),
+    interd = mean(c_across(InterSC1:InterSC12), na.rm = TRUE),
+    lonely = mean(c_across(SL1:SL15), na.rm = TRUE),
+    cmni = mean(c(CMNI1, CMNI2, CMNI3, CMNI8, CMNI11, CMNI14, CMNI16, CMNI18, CMNI19, CMNI20, CMNI21, CMNI22, CMNI24,
+                  CMNI26, CMNI28, CMNI29, CMNI30, CMNI31, CMNI32,CMNI35, CMNI36, CMNI37, CMNI39, CMNI42, CMNI43,
+                  CMNI44, CMNI45, CMNI46,CMNI4r, CMNI5r, CMNI6r, CMNI7r, CMNI9r, CMNI10r, CMNI12r, CMNI13r, CMNI15r,
+                  CMNI17r, CMNI23r, CMNI25r, CMNI27r, CMNI33r, CMNI34r, CMNI38r, CMNI40r,CMNI41r), na.rm = TRUE),
+    EI = mean(c(EI1r, EI2r, EI3r, EI4, EI5, EI6r), na.rm = TRUE),
+    agg = mean(c(Agg1, Agg2, Agg3, Agg4, Agg5, Agg6, Agg7, Agg8, Agg9, Agg10, Agg11, Agg12, Agg13, Agg14, Agg15r,
+                 Agg16, Agg17, Agg18, Agg19, Agg20, Agg21, Agg22, Agg23, Agg24r, Agg25, Agg26, Agg27, Agg28, 
+                 Agg29), na.rm = TRUE)
+  ) %>% 
+  ungroup()
+
+```
+
+### **Histograms and Descriptives**
+
+### First, we'll examine the histograms of our variables of interest. I wrote a function for the histograms instead of rewriting the code for each plot. Precarious manhood - self and PM - close others mirror each other in terms of distributions, whereas PM- society is slightly skewed. No values are outside the expected range.
+
+```{r histograms, error=FALSE, dpi=200}
+
+hist_funct <- function(.dat, variable, xlabel) {
+  plot_out <- .dat %>% 
+    filter(sex == 1) %>% 
+    ggplot() +
+    aes(x = {{variable}}) +
+    geom_histogram(aes(y = ..density..),
+                   color = "black", 
+                   fill = "white") +
+    geom_density(alpha = 0.2, fill = "#FF6666") +
+    xlab(xlabel)
+  
+  return(plot_out)
+}
+
+h1 <- hist_funct(data, EI, "Existential Isolation")
+h2 <- hist_funct(data, PMSelf, "PM - Self")
+h3 <- hist_funct(data, PMClose, "PM - Close Others")
+h4 <- hist_funct(data, PMSoc, "PM - Society")
+h5 <- hist_funct(data, cmni, "Conformity to\n Masculine Norms")
+h6 <- hist_funct(data, communal, "Communality")
+h7 <- hist_funct(data, interd, "Interdependence")
+h8 <- hist_funct(data, lonely, "Loneliness")
+h9 <- hist_funct(data, agg, "Aggression")
+
+
+wrap_plots(h1, h2, h3, h4, h5, h6, h7, h8, h9)
+
+
+```
+
+```{r summary tables}
+
+
+variables <- c("EI", "PMSelf", "PMClose", "PMSoc", "cmni", "communal", "interd", "lonely", "agg")
+
+tab1 <- data %>% 
+  filter(sex == 1) %>%
+  summarize(across(all_of(variables), 
+                   list(Mean = mean, 
+                        SD = sd,
+                        Median = median,
+                        Min = min,
+                        Max = max), 
+                   na.rm = TRUE)) %>% 
+  pivot_longer(cols = everything(), 
+               names_to = c("Scale", ".value"), 
+               names_sep = "_")
+
+tab1 %>% 
+  kbl(digits = 2,
+      caption = "Descriptive Statistics") %>%
+  kable_paper(font_size = 20,
+              bootstrap_options = c("striped", "responsive"))
+
+
+```
+
+### **Boxplots**
+
+### Again, I wrote a function for the univariate boxplots, just to see what the outlier situation was like. There are a few outliers in EI, interdependence, loneliness, and aggeression.
+
+```{r boxplots, error=FALSE, dpi=200}
+
+
+uni_boxplot_funct <- function(.dat, variable){
+  plot_out <- .dat %>% 
+    filter(sex ==1) %>% 
+    ggplot() +
+    aes(x = "", y = {{variable}}) +
+    geom_boxplot(color = "black",
+                 alpha = .5,
+                 width = .1,
+                 size = .5) +
+    theme(axis.title.x = element_blank())
+  
+  return(plot_out)
+}
+
+bp1 <- uni_boxplot_funct(data, EI)
+bp2 <- uni_boxplot_funct(data, PMSelf)
+bp3 <- uni_boxplot_funct(data, PMClose)
+bp4 <- uni_boxplot_funct(data, PMSoc)
+bp5 <- uni_boxplot_funct(data, cmni)
+bp6 <- uni_boxplot_funct(data, communal)
+bp7 <- uni_boxplot_funct(data, interd)
+bp8 <- uni_boxplot_funct(data, lonely)
+bp9 <- uni_boxplot_funct(data, agg)
+
+
+bp1+bp2+bp3+bp4+bp5+bp6+bp7+bp8+bp9
+
+```
+
+### **Scatterplots**
+
+### Below is a function for scatterplots along with a paired plot using the GGally package. Surprisingly, EI is completely uncorrelated with any of the PM variables. There appears to be no association between EI and PM in this sample, which is counter to our hypotheses. 
+
+```{r scatterplots, error=FALSE, dpi=200}
+
+
+scatter_funct <- function(.dat, xvar, yvar){
+  plot_out <- .dat %>% 
+    filter(sex == 1) %>% 
+    ggplot()+
+    aes(x ={{xvar}},
+      y = {{yvar}}) +
+  geom_jitter(alpha = 0.5) +
+  geom_smooth(method = "lm",
+              se = FALSE,
+              color = "steelblue")
+  
+  return(plot_out)
+}
+
+p1 <- scatter_funct(data, PMSelf, EI)
+p2 <- scatter_funct(data, PMClose, EI)
+p3 <- scatter_funct(data, PMSoc, EI)
+p4 <- scatter_funct(data, cmni, EI)
+p5 <- scatter_funct(data, communal, EI)
+p6 <- scatter_funct(data, interd, EI)
+p7 <- scatter_funct(data, lonely, EI)
+p8 <- scatter_funct(data, EI, agg)
+p9 <- scatter_funct(data, PMSelf, PMSoc)
+
+
+p1 + p2 + p3 +p4+p5+p6+p7+p8+p9
+
+data_focal <- data[, c("EI", "PMSelf", "PMClose", "PMSoc", "cmni", "communal", "interd", "lonely", "agg")]
+
+GGally::ggpairs(data_focal,
+                aes(alpha = 0.7))
+
+```
+
+### **Hypothesized Regression Model**
+
+### Now we'll take a look at some regression models. Controlling for loneliness, the interaction of PM-Self and PM-close others is a significant predictor of EI. However, simple slope and Johnson-Neyman analyses reveal that the simple slope of PM-self predicting EI is only significant for men who reported PM-close between 1.00 and 1.18, a tiny subset of our sample. However, among these men (i.e., those who report very low PM beliefs among close friends/family), there is a positive association between PM-self and EI. That is, for men whose close friends/family do not endorse PM, the more they personally endorse PM beliefs, the more existentially isolated they feel. This makes sense given the theory of EI - feeling as though your experiences do not match those of other people causes EI.
+
+```{r regression_mod1, error=FALSE, dpi=200}
+
+
+mod1 <- lm(EI ~ lonely + PMSelf + PMClose + PMSelf*PMClose,
+           data = data)
+
+summ(mod1)
+
+sim_slopes(mod1, 
+           pred = PMSelf, 
+           modx = PMClose,
+           johnson_neyman = TRUE)
+
+mod1_plot <- interact_plot(mod1, 
+                           pred = PMSelf, 
+                           modx = PMClose,
+                           plot.points = TRUE,
+                           partial.residuals = TRUE,
+                           colors = "Dark2") +
+  xlab("Precarious Manhood - Self") +
+  ylab("Existential Isolation") +
+  theme_classic()
+
+mod1_jn_plot <- johnson_neyman(mod1, 
+                               pred = PMSelf, 
+                               modx = PMClose,
+                               alpha = .05)
+
+mod1_plot
+mod1_jn_plot
+
+
+```
+
+
+### **Exploratory Regression Model**
+
+### Just for kicks, I was curious as to whether men who endorse PM and adhere strongly to masculine norms would report more aggressive behavior. This isn't a novel hypothesis by an means, but I wanted to confirm that pre-existing associations between masculinity and aggression were present in our data. The findings are consistent with this: among men who report high levels of conformity to masculine norms, the more they endorse PM, the more aggressive they are. For these men, both adhering to masculine norms and feeling as though their manhood status could be yannked away from them at a moment's notice play into aggressive behavior.
+
+
+```{r regression_mod2, error=FALSE, dpi=200}
+
+mod2 <- lm(agg ~ PMSelf + cmni + PMSelf*cmni,
+           data = data)
+
+summ(mod2)
+
+sim_slopes(mod2, 
+           pred = PMSelf, 
+           modx = cmni,
+           johnson_neyman = TRUE,
+           control.fdr = TRUE)
+
+mod2_plot <- interact_plot(mod2, 
+                           pred = PMSelf, 
+                           modx = cmni,
+                           plot.points = TRUE,
+                           partial.residuals = TRUE,
+                           colors = "Dark2") +
+  xlab("Precarious Manhood - Self") +
+  ylab("Aggression") +
+  theme_classic()
+
+mod2_jn_plot <- johnson_neyman(mod2, 
+                               pred = PMSelf, 
+                               modx = cmni,
+                               alpha = .05)
+
+mod2_plot
+mod2_jn_plot
+
+```
+
+
+## Summary
+
+### Our main hypothesized interaction did not fully replicate. However, there were some promising findings that I will follow up on in subsequent analyses.
