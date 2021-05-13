@@ -23,10 +23,21 @@ editor_options:
 ![It's definitely you meme](final_project_files/its_you.png)
 
 
-### This study is a follow-up to attempt to replicate our previous findings and extend them to aggression, a consequence of threatened masculinty. Over the course of 3 semesters, we sampled 291 college students on a variety of scales, including EI, PM self beliefs, PM beliefs among close friends/family, PM beliefs in society, conformity to masculine norms, communality, interdependence, loneliness, and aggression.
+### This study is a follow-up to attempt to replicate our previous findings and determine if it is in fact the disconnect between self-endorsed PM and beliefs about others PM that drives EI, or whether there is a simpler explanation: that generalized false consensus beliefs account for men's EI. Over the course of 3 semesters, we sampled 291 college students on a variety of scales, including EI, PM self beliefs, PM beliefs among close friends/family, PM beliefs in society, conformity to masculine norms, communality, interdependence, loneliness, and aggression.
+
+
+![Study 1 Findings](final_project_files/study1_finding.jpg)
 
 
 ![Replication cat meme](final_project_files/replication_cat.jpg)
+
+### **False Consensus Items***
+
+
+1. I have no fear of spiders.
+2. I think that I would like the kind of work that a forest ranger does.
+3. I think most people would lie to get ahead.
+4. Criticism or scolding hurts me terribly.
 
 
 ```{r setup, echo=FALSE, include = FALSE}
@@ -38,6 +49,7 @@ library(hablar)
 library(kableExtra)
 library(interactions)
 library(jtools)
+library(mvoutlier)
 theme_set(theme_classic())
 ```
 
@@ -60,6 +72,8 @@ data <- data %>% convert(dte(StartDate, EndDate),
                  fct(kids),
                  int(numKids),
                  fct(finProvider:distracted))
+
+
 
 
 ```
@@ -104,9 +118,39 @@ data <- data %>%
     EI = mean(c(EI1r, EI2r, EI3r, EI4, EI5, EI6r), na.rm = TRUE),
     agg = mean(c(Agg1, Agg2, Agg3, Agg4, Agg5, Agg6, Agg7, Agg8, Agg9, Agg10, Agg11, Agg12, Agg13, Agg14, Agg15r,
                  Agg16, Agg17, Agg18, Agg19, Agg20, Agg21, Agg22, Agg23, Agg24r, Agg25, Agg26, Agg27, Agg28, 
-                 Agg29), na.rm = TRUE)
+                 Agg29), na.rm = TRUE),
+    FalseCons = mean(c_across(FC1_Cons_1:FC4_Cons_1))
   ) %>% 
   ungroup()
+
+clean_data <- data %>% 
+  filter(sex == 1 & attnchk1 == 5)
+
+```
+
+
+### **Normality Checks**
+
+### There is a bit of non-normality at the higher end of EI, but it doesn't appear that bad.
+
+
+```{r normality}
+
+ggpubr::ggqqplot(clean_data$EI) +
+  ylab("EI")
+
+ggpubr::ggqqplot(clean_data$PMSelf) +
+  ylab("PM - Self")
+
+ggpubr::ggqqplot(clean_data$PMClose) +
+  ylab("PM - Close")
+
+ggpubr::ggqqplot(clean_data$PMSoc) +
+  ylab("PM - Society")
+
+ggpubr::ggqqplot(clean_data$FalseCons) +
+  ylab("False Consensus")
+
 
 ```
 
@@ -118,7 +162,7 @@ data <- data %>%
 
 hist_funct <- function(.dat, variable, xlabel) {
   plot_out <- .dat %>% 
-    filter(sex == 1) %>% 
+    filter(sex == 1 & attnchk1 == 5) %>% 
     ggplot() +
     aes(x = {{variable}}) +
     geom_histogram(aes(y = ..density..),
@@ -139,9 +183,10 @@ h6 <- hist_funct(data, communal, "Communality")
 h7 <- hist_funct(data, interd, "Interdependence")
 h8 <- hist_funct(data, lonely, "Loneliness")
 h9 <- hist_funct(data, agg, "Aggression")
+h10 <- hist_funct(data, FalseCons, "False Consensus")
 
 
-wrap_plots(h1, h2, h3, h4, h5, h6, h7, h8, h9)
+wrap_plots(h1, h2, h3, h4, h5, h6, h7, h8, h9, h10)
 
 
 ```
@@ -149,10 +194,10 @@ wrap_plots(h1, h2, h3, h4, h5, h6, h7, h8, h9)
 ```{r summary tables}
 
 
-variables <- c("EI", "PMSelf", "PMClose", "PMSoc", "cmni", "communal", "interd", "lonely", "agg")
+variables <- c("EI", "PMSelf", "PMClose", "PMSoc", "cmni", "communal", "interd", "lonely", "agg", "FalseCons")
 
 tab1 <- data %>% 
-  filter(sex == 1) %>%
+  filter(sex == 1 & attnchk1 == 5) %>%
   summarize(across(all_of(variables), 
                    list(Mean = mean, 
                         SD = sd,
@@ -182,7 +227,7 @@ tab1 %>%
 
 uni_boxplot_funct <- function(.dat, variable){
   plot_out <- .dat %>% 
-    filter(sex ==1) %>% 
+    filter(sex ==1 & attnchk1 == 5) %>% 
     ggplot() +
     aes(x = "", y = {{variable}}) +
     geom_boxplot(color = "black",
@@ -203,11 +248,95 @@ bp6 <- uni_boxplot_funct(data, communal)
 bp7 <- uni_boxplot_funct(data, interd)
 bp8 <- uni_boxplot_funct(data, lonely)
 bp9 <- uni_boxplot_funct(data, agg)
+b10 <- uni_boxplot_funct(data, FalseCons)
 
 
-bp1+bp2+bp3+bp4+bp5+bp6+bp7+bp8+bp9
+bp1+bp2+bp3+bp4+bp5+bp6+bp7+bp8+bp9+b10
 
 ```
+
+### Outliers
+
+### Next, I'll remove multivariate outliers from our variables of interest. This reduces the sample size from 264 to 225.
+
+```{r outliers}
+
+outlier_data <- clean_data %>% 
+  select(c("PMSelf", "PMClose", "FalseCons", "EI", "PMSoc", "lonely"))
+
+outlier_data <- outlier_data %>% 
+  filter(!(is.na(PMSelf))) %>% 
+  filter(!(is.na(PMClose))) %>% 
+  filter(!(is.na(FalseCons))) %>% 
+  filter(!(is.na(EI))) %>% 
+  filter(!(is.na(PMSoc))) %>%
+  filter(!(is.na(lonely))) %>%
+  as.data.frame()
+
+PM_out <- aq.plot(outlier_data)
+
+out_data <- cbind(outlier_data, PM_out$outliers)
+
+out_data <- out_data %>% 
+  filter(PM_out$outliers == FALSE)
+
+
+```
+
+
+### **Reliability**
+
+### Reliability is good for all scales except for the false consensus items, which is rather low. I'll continue using them for these analyses but will go back and see if there's anything I can do to adjust this.
+
+```{r alpha, echo=FALSE, dpi=200}
+
+communal <- clean_data %>% 
+  select(CV1:CV12)
+
+PMSelf <- clean_data %>% 
+  select(PMSelf1:PMSelf7)
+
+PMSoc <- clean_data %>% 
+  select(PMSoc1:PMSoc7)
+
+PMClose <- clean_data %>% 
+  select(PMClose1:PMClose7)
+
+interd <- clean_data %>% 
+  select(InterSC1:InterSC12)
+
+lonely <- clean_data %>% 
+  select(SL1:SL15)
+
+cmni <- clean_data %>% 
+  select(c(CMNI1, CMNI2, CMNI3, CMNI8, CMNI11, CMNI14, CMNI16, CMNI18, CMNI19, CMNI20, CMNI21, CMNI22, CMNI24,
+           CMNI26, CMNI28, CMNI29, CMNI30, CMNI31, CMNI32,CMNI35, CMNI36, CMNI37, CMNI39, CMNI42, CMNI43,
+           CMNI44, CMNI45, CMNI46,CMNI4r, CMNI5r, CMNI6r, CMNI7r, CMNI9r, CMNI10r, CMNI12r, CMNI13r, CMNI15r,
+           CMNI17r, CMNI23r, CMNI25r, CMNI27r, CMNI33r, CMNI34r, CMNI38r, CMNI40r,CMNI41r))
+EI <- clean_data %>% 
+  select(c(EI1r, EI2r, EI3r, EI4, EI5, EI6r))
+
+Agg <- clean_data %>% 
+  select(c(Agg1, Agg2, Agg3, Agg4, Agg5, Agg6, Agg7, Agg8, Agg9, Agg10, Agg11, Agg12, Agg13, Agg14, Agg15r,
+           Agg16, Agg17, Agg18, Agg19, Agg20, Agg21, Agg22, Agg23, Agg24r, Agg25, Agg26, Agg27, Agg28, 
+           Agg29))
+
+false_consens <- clean_data %>% 
+  select(c(FC1_Cons_1, FC2_Cons_1, FC3_Cons_1, FC4_Cons_1))
+
+psych::alpha(EI)
+psych::alpha(PMSelf)
+psych::alpha(PMClose)
+psych::alpha(false_consens)
+psych::alpha(PMSoc)
+psych::alpha(cmni)
+psych::alpha(interd)
+psych::alpha(communal)
+psych::alpha(Agg)
+
+```
+
+
 
 ### **Scatterplots**
 
@@ -218,7 +347,7 @@ bp1+bp2+bp3+bp4+bp5+bp6+bp7+bp8+bp9
 
 scatter_funct <- function(.dat, xvar, yvar){
   plot_out <- .dat %>% 
-    filter(sex == 1) %>% 
+    filter(sex == 1 & attnchk1 == 5) %>% 
     ggplot()+
     aes(x ={{xvar}},
       y = {{yvar}}) +
@@ -252,13 +381,11 @@ GGally::ggpairs(data_focal,
 
 ### **Hypothesized Regression Model**
 
-### Now we'll take a look at some regression models. Controlling for loneliness, the interaction of PM-Self and PM-close others is a significant predictor of EI. However, simple slope and Johnson-Neyman analyses reveal that the simple slope of PM-self predicting EI is only significant for men who reported PM-close between 1.00 and 1.18, a tiny subset of our sample. However, among these men (i.e., those who report very low PM beliefs among close friends/family), there is a positive association between PM-self and EI. That is, for men whose close friends/family do not endorse PM, the more they personally endorse PM beliefs, the more existentially isolated they feel. This makes sense given the theory of EI - feeling as though your experiences do not match those of other people causes EI.
-
+### Now we'll take a look at some regression models. Controlling for false consensus, the interaction of PM-Self and PM-close others is a significant predictor of EI. However, simple slope and Johnson-Neyman analyses reveal that the pattern is different than our findings from Study 1. 
 ```{r regression_mod1, error=FALSE, dpi=200}
 
-
-mod1 <- lm(EI ~ lonely + PMSelf + PMClose + PMSelf*PMClose,
-           data = data)
+mod1 <- lm(EI ~ FalseCons + PMSelf + PMClose + PMSelf*PMClose,
+           data = out_data)
 
 summ(mod1)
 
@@ -285,6 +412,136 @@ mod1_jn_plot <- johnson_neyman(mod1,
 mod1_plot
 mod1_jn_plot
 
+```
+
+
+![Study 1 Findings Redux](final_project_files/study1_finding.jpg)
+
+
+```{r regression_mod3, error=FALSE, dpi=200}
+
+mod3 <- lm(EI ~ FalseCons + PMSelf + PMSoc + PMSelf*PMSoc,
+           data = out_data)
+
+summ(mod3)
+
+sim_slopes(mod3, 
+           pred = PMSelf, 
+           modx = PMSoc,
+           johnson_neyman = TRUE)
+
+mod3_plot <- interact_plot(mod3, 
+                           pred = PMSelf, 
+                           modx = PMSoc,
+                           plot.points = TRUE,
+                           partial.residuals = TRUE,
+                           colors = "Dark2") +
+  xlab("Precarious Manhood - Self") +
+  ylab("Existential Isolation") +
+  theme_classic()
+
+mod3_plot
+
+
+```
+
+```{r regression_mod4, error=FALSE, dpi=200}
+
+mod4 <- lm(EI ~ FalseCons + PMClose + PMSoc + PMClose*PMSoc,
+           data = out_data)
+
+summ(mod4)
+
+sim_slopes(mod4, 
+           pred = PMClose, 
+           modx = PMSoc,
+           johnson_neyman = TRUE)
+
+mod4_plot <- interact_plot(mod4, 
+                           pred = PMClose, 
+                           modx = PMSoc,
+                           plot.points = TRUE,
+                           partial.residuals = TRUE,
+                           colors = "Dark2") +
+  xlab("Precarious Manhood - Close Others") +
+  ylab("Existential Isolation") +
+  theme_classic()
+
+mod4_jn_plot <- johnson_neyman(mod4, 
+                               pred = PMClose, 
+                               modx = PMSoc,
+                               alpha = .05)
+
+
+mod4_plot
+mod4_jn_plot
+
+```
+
+```{r regression_mod5, error=FALSE, dpi=200}
+
+mod5 <- lm(EI ~ lonely + FalseCons + PMSelf + PMClose + PMSelf*PMClose,
+           data = out_data)
+
+summ(mod5)
+
+sim_slopes(mod5, 
+           pred = PMSelf, 
+           modx = PMClose,
+           johnson_neyman = TRUE)
+
+mod5_plot <- interact_plot(mod5, 
+                           pred = PMSelf, 
+                           modx = PMClose,
+                           plot.points = TRUE,
+                           partial.residuals = TRUE,
+                           colors = "Dark2") +
+  xlab("Precarious Manhood - Self") +
+  ylab("Existential Isolation") +
+  theme_classic()
+
+mod5_jn_plot <- johnson_neyman(mod1, 
+                               pred = PMSelf, 
+                               modx = PMClose,
+                               alpha = .05)
+
+mod5_plot
+mod5_jn_plot
+
+```
+
+
+```{r regression_mod2, error=FALSE, dpi=200}
+
+
+mod2 <- lm(EI ~ lonely + PMSelf + PMClose + PMSelf*PMClose,
+           data = out_data)
+
+summ(mod2)
+
+sim_slopes(mod2, 
+           pred = PMSelf, 
+           modx = PMClose,
+           johnson_neyman = TRUE)
+
+mod2_plot <- interact_plot(mod2, 
+                           pred = PMSelf, 
+                           modx = PMClose,
+                           plot.points = TRUE,
+                           partial.residuals = TRUE,
+                           colors = "Dark2") +
+  xlab("Precarious Manhood - Self") +
+  ylab("Existential Isolation") +
+  theme_classic()
+
+mod2_jn_plot <- johnson_neyman(mod2, 
+                               pred = PMSelf, 
+                               modx = PMClose,
+                               alpha = .05)
+
+mod2_plot
+mod2_jn_plot
+
 
 ```
 
@@ -294,7 +551,7 @@ mod1_jn_plot
 ### Just for kicks, I was curious as to whether men who endorse PM and adhere strongly to masculine norms would report more aggressive behavior. This isn't a novel hypothesis by an means, but I wanted to confirm that pre-existing associations between masculinity and aggression were present in our data. The findings are consistent with this: among men who report high levels of conformity to masculine norms, the more they endorse PM, the more aggressive they are. For these men, both adhering to masculine norms and feeling as though their manhood status could be yannked away from them at a moment's notice play into aggressive behavior.
 
 
-```{r regression_mod2, error=FALSE, dpi=200}
+```{r regression_mod6, error=FALSE, dpi=200}
 
 mod2 <- lm(agg ~ PMSelf + cmni + PMSelf*cmni,
            data = data)
